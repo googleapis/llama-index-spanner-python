@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "llama-index-spanner"
+version = "0.1.0"
+description = "LlamaIndex integrations for Google Cloud Spanner"
+authors = ["Google LLC <googleapis-packages@google.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.9,<4.0"
+google-cloud-spanner = ">=3.41.0,<4.0.0"
+llama-index-core = "^0.12.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "8.3.3"
+llama-index = "^0.12.22"
+pyvis = "^0.3.2"
+pytest-xdist = "^3.6.1"
+llama-index-llms-google-genai = "^0.1.4"
+llama-index-readers-wikipedia = "^0.3.0"
+wikipedia = "^1.4.0"
+llama-index-embeddings-google-genai = "^0.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
