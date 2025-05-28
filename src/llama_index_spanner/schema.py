@@ -38,7 +38,7 @@ def remove_empty_values(input_dict):
 
 def group_nodes(
     nodes: List[LabelledNode],
-) -> dict[str, List[LabelledNode]]:
+) -> Dict[str, List[LabelledNode]]:
   """Groups nodes by their respective types.
 
   Args:
@@ -47,7 +47,7 @@ def group_nodes(
   Returns:
     A dictionary mapping node types to lists of LabelledNodes.
   """
-  nodes_group: CaseInsensitiveDict[dict[str, LabelledNode]] = (
+  nodes_group: CaseInsensitiveDict[Dict[str, LabelledNode]] = (
       CaseInsensitiveDict()
   )
   for node in nodes:
@@ -63,7 +63,7 @@ def group_nodes(
 
 def group_edges(
     edges: List[Tuple[Relation, str, str, str, str]],
-) -> dict[str, List[Tuple[Relation, str, str]]]:
+) -> Dict[str, List[Tuple[Relation, str, str]]]:
   """Groups edges by their respective types.
 
   Args:
@@ -79,7 +79,7 @@ def group_edges(
       - The target node table name.
   """
   edges_group: CaseInsensitiveDict[
-      dict[Tuple[str, str, str], Tuple[Relation, str, str]]
+      Dict[Tuple[str, str, str], Tuple[Relation, str, str]]
   ] = CaseInsensitiveDict()
   for edge, source_label, source_table, target_label, target_table in edges:
     edge_name = (
@@ -159,9 +159,9 @@ class ElementSchema(object):
   key_columns: List[str]
   base_table_name: str
   labels: List[str]
-  properties: Dict[str, str]
+  properties: CaseInsensitiveDict[str]
   # types: A dictionary where keys are property names (strings) and values are Spanner type definitions
-  types: Dict[str, param_types.Type]
+  types: CaseInsensitiveDict[param_types.Type]
   source: NodeReference
   target: NodeReference
 
@@ -181,7 +181,7 @@ class ElementSchema(object):
   def make_node_schema(
       node_label: str,
       graph_name: str,
-      property_types: Dict[str, param_types.Type],
+      property_types: CaseInsensitiveDict[param_types.Type],
   ) -> ElementSchema:
     """Creates a node schema for a given node type and label."""
     node = ElementSchema()
@@ -199,7 +199,7 @@ class ElementSchema(object):
       edge_label: str,
       graph_schema: SpannerGraphSchema,
       key_columns: List[str],
-      property_types: Dict[str, param_types.Type],
+      property_types: CaseInsensitiveDict[param_types.Type],
       source_node_table: str,
       target_node_table: str,
   ) -> ElementSchema:
@@ -741,11 +741,11 @@ class SpannerGraphSchema(object):
       )
 
     self.graph_name: str = graph_name
-    self.node_tables: Dict[str, ElementSchema] = CaseInsensitiveDict({})
-    self.edge_tables: Dict[str, ElementSchema] = CaseInsensitiveDict({})
-    self.labels: Dict[str, Label] = CaseInsensitiveDict({})
-    self.properties: Dict[str, param_types.Type] = CaseInsensitiveDict({})
-    self.node_properties: Dict[str, param_types.Type] = CaseInsensitiveDict({})
+    self.node_tables: CaseInsensitiveDict[ElementSchema] = CaseInsensitiveDict({})
+    self.edge_tables: CaseInsensitiveDict[ElementSchema] = CaseInsensitiveDict({})
+    self.labels: CaseInsensitiveDict[Label] = CaseInsensitiveDict({})
+    self.properties: CaseInsensitiveDict[param_types.Type] = CaseInsensitiveDict({})
+    self.node_properties: CaseInsensitiveDict[param_types.Type] = CaseInsensitiveDict({})
     self.use_flexible_schema = use_flexible_schema
     self.static_node_properties = set(static_node_properties or [])
     self.static_edge_properties = set(static_edge_properties or [])
@@ -753,8 +753,8 @@ class SpannerGraphSchema(object):
 
   def evolve_from_nodes(
       self,
-      nodes: dict[str, List[LabelledNode]],
-  ) -> Tuple[List[str], dict[str, ElementSchema]]:
+      nodes: Dict[str, List[LabelledNode]],
+  ) -> Tuple[List[str], Dict[str, ElementSchema]]:
     """Evolves the graph schema based on new nodes and edges.
 
     This method updates the internal schema representation by adding new
@@ -789,8 +789,8 @@ class SpannerGraphSchema(object):
 
   def evolve_from_edges(
       self,
-      edges: dict[str, List[Tuple[Relation, str, str]]],
-  ) -> Tuple[List[str], dict[str, ElementSchema], dict[str, ElementSchema]]:
+      edges: Dict[str, List[Tuple[Relation, str, str]]],
+  ) -> Tuple[List[str], Dict[str, ElementSchema]]:
     """Evolves the graph schema based on new edges.
 
     This method updates the internal schema representation by adding new
@@ -902,7 +902,7 @@ class SpannerGraphSchema(object):
 
     def construct_label_and_properties(
         target_label: str,
-        labels: Dict[str, Label],
+        labels: CaseInsensitiveDict[Label],
         element: ElementSchema,
     ) -> str:
       props = labels[target_label].prop_names
@@ -917,7 +917,7 @@ class SpannerGraphSchema(object):
 
     def construct_label_and_properties_list(
         target_labels: List[str],
-        labels: Dict[str, Label],
+        labels: CaseInsensitiveDict[Label],
         element: ElementSchema,
     ) -> str:
       return "\n".join((
@@ -942,7 +942,7 @@ class SpannerGraphSchema(object):
       )
 
     def construct_element_table(
-        element: ElementSchema, labels: Dict[str, Label]
+        element: ElementSchema, labels: CaseInsensitiveDict[Label]
     ) -> str:
       definition = [
           "{} AS {}".format(

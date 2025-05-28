@@ -18,7 +18,7 @@ import random
 from llama_index.core.storage import StorageContext
 from llama_index.embeddings.google_genai import GoogleGenAIEmbedding
 from llama_index.llms.google_genai import GoogleGenAI
-from src.llama_index_spanner import SpannerGraphStore, SpannerPropertyGraphStore
+from llama_index_spanner import SpannerPropertyGraphStore
 
 spanner_instance_id = (
     os.environ.get("SPANNER_INSTANCE_ID") or "graphdb-spanner-llama"
@@ -29,27 +29,13 @@ spanner_database_id = (
 spanner_graph_name = os.environ.get("SPANNER_GRAPH_NAME") or "llama_index_graph"
 
 
-def get_spanner_graph_store(
-    graph_name_suffix: str = "", clean_up: bool = False
-) -> SpannerGraphStore:
-  """Get a SpannerGraphStore instance for testing."""
-  graph_name = spanner_graph_name
-  if graph_name_suffix:
-    graph_name += "_" + graph_name_suffix
-  return SpannerGraphStore(
-      instance_id=spanner_instance_id,
-      database_id=spanner_database_id,
-      graph_name=graph_name,
-      clean_up=clean_up,
-  )
-
 
 def get_spanner_property_graph_store(
     graph_name_suffix: str = "",
     use_flexible_schema: bool = False,
     clean_up: bool = False,
 ) -> SpannerPropertyGraphStore:
-  """Get a SpannerGraphStore instance for testing."""
+  """Get a SpannerPropertyGraphStore instance for testing."""
   graph_name = spanner_graph_name
   if graph_name_suffix:
     graph_name += "_" + graph_name_suffix

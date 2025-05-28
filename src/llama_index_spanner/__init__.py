@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .version import __version__
+from .property_graph_store import SpannerPropertyGraphStore
 from .graph_retriever import (
     SpannerGraphCustomRetriever,
     SpannerGraphTextToGQLRetriever,
 )
-from .property_graph_store import SpannerPropertyGraphStore
-from .version import __version__
 
 __all__ = [
     __version__,

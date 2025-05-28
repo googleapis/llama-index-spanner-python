@@ -12,13 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
 from typing import Generator
 from llama_index.core.graph_stores.types import (
     ChunkNode,
     EntityNode,
-    LabelledNode,
-    PropertyGraphStore,
     Relation,
 )
 from llama_index.core.vector_stores.types import (
@@ -30,8 +27,8 @@ from llama_index.core.vector_stores.types import (
     VectorStoreQuery,
 )
 import pytest
-from src.llama_index_spanner.property_graph_store import SpannerPropertyGraphStore
-from src.llama_index_spanner.schema import ElementSchema
+from llama_index_spanner.property_graph_store import SpannerPropertyGraphStore
+from llama_index_spanner.schema import ElementSchema
 from tests.utils import (
     get_random_suffix,
     get_spanner_property_graph_store,
@@ -55,7 +52,7 @@ pytestmark = pytest.mark.skipif(
 
 
 @pytest.fixture
-def property_graph_store_static() -> Generator[SpannerPropertyGraphStore]:
+def property_graph_store_static() -> Generator[SpannerPropertyGraphStore, None, None]:
   """Provides a fresh SpannerPropertyGraphStore for each test."""
   graph_store = get_spanner_property_graph_store(
       graph_name_suffix=get_random_suffix()
@@ -65,7 +62,7 @@ def property_graph_store_static() -> Generator[SpannerPropertyGraphStore]:
 
 
 @pytest.fixture
-def property_graph_store_dynamic() -> Generator[SpannerPropertyGraphStore]:
+def property_graph_store_dynamic() -> Generator[SpannerPropertyGraphStore, None, None]:
   """Provides a fresh SpannerPropertyGraphStore for each test."""
   graph_store_dynamic_schema = get_spanner_property_graph_store(
       use_flexible_schema=True,

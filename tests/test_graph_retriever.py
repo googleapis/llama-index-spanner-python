@@ -23,7 +23,7 @@ from llama_index.core.indices.property_graph import SchemaLLMPathExtractor
 from llama_index.core.query_engine import RetrieverQueryEngine
 from llama_index.readers.wikipedia import WikipediaReader
 import pytest
-from src.llama_index_spanner.graph_retriever import (
+from llama_index_spanner.graph_retriever import (
     SpannerGraphCustomRetriever,
     SpannerGraphTextToGQLRetriever,
 )
