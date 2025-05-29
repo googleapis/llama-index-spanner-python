@@ -22,144 +22,144 @@ from google.cloud.spanner_v1 import JsonObject, param_types
 
 
 class TypeUtility(object):
-  """A utiltiy class with helper functions that do type conversions related to Spanner."""
+    """A utiltiy class with helper functions that do type conversions related to Spanner."""
 
-  @staticmethod
-  def spanner_type_to_schema_str(
-      t: param_types.Type,
-      include_type_annotations: bool = False,
-  ) -> str:
-    """Returns a Spanner string representation of a Spanner type.
+    @staticmethod
+    def spanner_type_to_schema_str(
+        t: param_types.Type,
+        include_type_annotations: bool = False,
+    ) -> str:
+        """Returns a Spanner string representation of a Spanner type.
 
-    Parameters:
-    - t: spanner.param_types.Type;
-    - include_type_annotations: boolean indicates whether to include type
-      annotations.
+        Parameters:
+        - t: spanner.param_types.Type;
+        - include_type_annotations: boolean indicates whether to include type
+          annotations.
 
-    Returns:
-    - str: a Spanner string representation of a Spanner type.
-    """
-    if t.code == param_types.TypeCode.ARRAY:
-      return "ARRAY<{}>".format(
-          TypeUtility.spanner_type_to_schema_str(
-              t.array_element_type,
-              include_type_annotations=include_type_annotations,
-          )
-      )
-    if t.code == param_types.TypeCode.BOOL:
-      return "BOOL"
-    if t.code == param_types.TypeCode.INT64:
-      return "INT64"
-    if t.code == param_types.TypeCode.STRING:
-      return "STRING(MAX)" if include_type_annotations else "STRING"
-    if t.code == param_types.TypeCode.BYTES:
-      return "BYTES(MAX)" if include_type_annotations else "BYTES"
-    if t.code == param_types.TypeCode.FLOAT32:
-      return "FLOAT32"
-    if t.code == param_types.TypeCode.FLOAT64:
-      return "FLOAT64"
-    if t.code == param_types.TypeCode.TIMESTAMP:
-      return "TIMESTAMP"
-    if t.code == param_types.TypeCode.JSON:
-      return "JSON"
-    if t.code == param_types.TypeCode.DATE:
-      return "DATE"
-    raise ValueError("Unsupported type: %s" % t)
+        Returns:
+        - str: a Spanner string representation of a Spanner type.
+        """
+        if t.code == param_types.TypeCode.ARRAY:
+            return "ARRAY<{}>".format(
+                TypeUtility.spanner_type_to_schema_str(
+                    t.array_element_type,
+                    include_type_annotations=include_type_annotations,
+                )
+            )
+        if t.code == param_types.TypeCode.BOOL:
+            return "BOOL"
+        if t.code == param_types.TypeCode.INT64:
+            return "INT64"
+        if t.code == param_types.TypeCode.STRING:
+            return "STRING(MAX)" if include_type_annotations else "STRING"
+        if t.code == param_types.TypeCode.BYTES:
+            return "BYTES(MAX)" if include_type_annotations else "BYTES"
+        if t.code == param_types.TypeCode.FLOAT32:
+            return "FLOAT32"
+        if t.code == param_types.TypeCode.FLOAT64:
+            return "FLOAT64"
+        if t.code == param_types.TypeCode.TIMESTAMP:
+            return "TIMESTAMP"
+        if t.code == param_types.TypeCode.JSON:
+            return "JSON"
+        if t.code == param_types.TypeCode.DATE:
+            return "DATE"
+        raise ValueError("Unsupported type: %s" % t)
 
-  @staticmethod
-  def schema_str_to_spanner_type(s: str) -> param_types.Type:
-    """Returns a Spanner type corresponding to the string representation from Spanner schema type.
+    @staticmethod
+    def schema_str_to_spanner_type(s: str) -> param_types.Type:
+        """Returns a Spanner type corresponding to the string representation from Spanner schema type.
 
-    Parameters:
-    - s: string representation of a Spanner schema type.
+        Parameters:
+        - s: string representation of a Spanner schema type.
 
-    Returns:
-    - Type[Any]: the corresponding Spanner type.
-    """
-    if s == "BOOL":
-      return param_types.BOOL
-    if s == "INT64":
-      return param_types.INT64
-    if s == "STRING":
-      return param_types.STRING
-    if s == "BYTES":
-      return param_types.BYTES
-    if s == "FLOAT64":
-      return param_types.FLOAT64
-    if s == "FLOAT32" or s == "FLOAT":
-      return param_types.FLOAT32
-    if s == "TIMESTAMP":
-      return param_types.TIMESTAMP
-    if s == "JSON":
-      return param_types.JSON
-    if s == "DATE":
-      return param_types.DATE
-    if s.startswith("ARRAY<") and s.endswith(">"):
-      return param_types.Array(
-          TypeUtility.schema_str_to_spanner_type(s[len("ARRAY<") : -len(">")])
-      )
-    raise ValueError("Unsupported type: %s" % s)
+        Returns:
+        - Type[Any]: the corresponding Spanner type.
+        """
+        if s == "BOOL":
+            return param_types.BOOL
+        if s == "INT64":
+            return param_types.INT64
+        if s == "STRING":
+            return param_types.STRING
+        if s == "BYTES":
+            return param_types.BYTES
+        if s == "FLOAT64":
+            return param_types.FLOAT64
+        if s == "FLOAT32" or s == "FLOAT":
+            return param_types.FLOAT32
+        if s == "TIMESTAMP":
+            return param_types.TIMESTAMP
+        if s == "JSON":
+            return param_types.JSON
+        if s == "DATE":
+            return param_types.DATE
+        if s.startswith("ARRAY<") and s.endswith(">"):
+            return param_types.Array(
+                TypeUtility.schema_str_to_spanner_type(s[len("ARRAY<") : -len(">")])
+            )
+        raise ValueError("Unsupported type: %s" % s)
 
-  @staticmethod
-  def value_to_param_type(v: Any) -> param_types.Type:
-    """Returns a Spanner type corresponding to the python value.
+    @staticmethod
+    def value_to_param_type(v: Any) -> param_types.Type:
+        """Returns a Spanner type corresponding to the python value.
 
-    Parameters:
-    - v: a python value.
+        Parameters:
+        - v: a python value.
 
-    Returns:
-    - Type[Any]: the corresponding Spanner type.
-    """
-    if isinstance(v, bool):
-      return param_types.BOOL
-    if isinstance(v, int):
-      return param_types.INT64
-    if isinstance(v, str):
-      return param_types.STRING
-    if isinstance(v, bytes):
-      return param_types.BYTES
-    if isinstance(v, float):
-      return param_types.FLOAT64
-    if isinstance(v, datetime.datetime):
-      return param_types.TIMESTAMP
-    if isinstance(v, datetime.date):
-      return param_types.DATE
-    if isinstance(v, JsonObject):
-      return param_types.JSON
-    if isinstance(v, list):
-      if len(v) == 0:
-        raise ValueError("Unknown element type of empty array")
-      return param_types.Array(TypeUtility.value_to_param_type(v[0]))
-    raise ValueError("Unsupported type of param: {}".format(v))
+        Returns:
+        - Type[Any]: the corresponding Spanner type.
+        """
+        if isinstance(v, bool):
+            return param_types.BOOL
+        if isinstance(v, int):
+            return param_types.INT64
+        if isinstance(v, str):
+            return param_types.STRING
+        if isinstance(v, bytes):
+            return param_types.BYTES
+        if isinstance(v, float):
+            return param_types.FLOAT64
+        if isinstance(v, datetime.datetime):
+            return param_types.TIMESTAMP
+        if isinstance(v, datetime.date):
+            return param_types.DATE
+        if isinstance(v, JsonObject):
+            return param_types.JSON
+        if isinstance(v, list):
+            if len(v) == 0:
+                raise ValueError("Unknown element type of empty array")
+            return param_types.Array(TypeUtility.value_to_param_type(v[0]))
+        raise ValueError("Unsupported type of param: {}".format(v))
 
-  @staticmethod
-  def value_for_json(v: Any) -> Any:
-    """Returns a value for JSON.
+    @staticmethod
+    def value_for_json(v: Any) -> Any:
+        """Returns a value for JSON.
 
-    Parameters:
-    - v: a python value.
-    """
-    if isinstance(v, bool):
-      return v
-    if isinstance(v, int):
-      return v
-    if isinstance(v, str):
-      return v
-    if isinstance(v, float):
-      return str(v)
-    if isinstance(v, bytes):
-      return base64.b64encode(v).decode("utf-8")
-    if isinstance(v, datetime.datetime):
-      return str(v)
-    if isinstance(v, datetime.date):
-      return str(v)
-    if isinstance(v, JsonObject):
-      return v
-    if isinstance(v, list):
-      return [TypeUtility.value_for_json(e) for e in v]
-    if isinstance(v, dict):
-      return {
-          TypeUtility.value_for_json(k): TypeUtility.value_for_json(v)
-          for k, v in v.items()
-      }
-    raise ValueError("Unsupported type of param: {}".format(v))
+        Parameters:
+        - v: a python value.
+        """
+        if isinstance(v, bool):
+            return v
+        if isinstance(v, int):
+            return v
+        if isinstance(v, str):
+            return v
+        if isinstance(v, float):
+            return str(v)
+        if isinstance(v, bytes):
+            return base64.b64encode(v).decode("utf-8")
+        if isinstance(v, datetime.datetime):
+            return str(v)
+        if isinstance(v, datetime.date):
+            return str(v)
+        if isinstance(v, JsonObject):
+            return v
+        if isinstance(v, list):
+            return [TypeUtility.value_for_json(e) for e in v]
+        if isinstance(v, dict):
+            return {
+                TypeUtility.value_for_json(k): TypeUtility.value_for_json(v)
+                for k, v in v.items()
+            }
+        raise ValueError("Unsupported type of param: {}".format(v))

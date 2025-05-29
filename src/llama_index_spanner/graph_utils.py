@@ -18,53 +18,47 @@ import re
 
 
 def fix_gql_syntax(query: str) -> str:
-  """Fixes the syntax of a GQL query.
+    """Fixes the syntax of a GQL query.
 
-  Example 1:
+    Example 1:
 
-      Input:
-          MATCH (p:paper {id: 0})-[c:cites*8]->(p2:paper)
-      Output:
-          MATCH (p:paper {id: 0})-[c:cites]->{8}(p2:paper)
-  Example 2:
-      Input:
-          MATCH (p:paper {id: 0})-[c:cites*1..8]->(p2:paper)
-      Output:
-          MATCH (p:paper {id: 0})-[c:cites]->{1:8}(p2:paper)
+        Input:
+            MATCH (p:paper {id: 0})-[c:cites*8]->(p2:paper)
+        Output:
+            MATCH (p:paper {id: 0})-[c:cites]->{8}(p2:paper)
+    Example 2:
+        Input:
+            MATCH (p:paper {id: 0})-[c:cites*1..8]->(p2:paper)
+        Output:
+            MATCH (p:paper {id: 0})-[c:cites]->{1:8}(p2:paper)
 
-  Args:
-      query: The input GQL query.
+    Args:
+        query: The input GQL query.
 
-  Returns:
-      Possibly modified GQL query.
-  """
+    Returns:
+        Possibly modified GQL query.
+    """
 
-  query = re.sub(
-      r"-\[(.*?):(\w+)\*(\d+)\.\.(\d+)\]->", r"-[\1:\2]->{\3,\4}", query
-  )
-  query = re.sub(r"-\[(.*?):(\w+)\*(\d+)\]->", r"-[\1:\2]->{\3}", query)
-  query = re.sub(
-      r"<-\[(.*?):(\w+)\*(\d+)\.\.(\d+)\]-", r"<-[\1:\2]-{\3,\4}", query
-  )
-  query = re.sub(r"<-\[(.*?):(\w+)\*(\d+)\]-", r"<-[\1:\2]-{\3}", query)
-  query = re.sub(
-      r"-\[(.*?):(\w+)\*(\d+)\.\.(\d+)\]-", r"-[\1:\2]-{\3,\4}", query
-  )
-  query = re.sub(r"-\[(.*?):(\w+)\*(\d+)\]-", r"-[\1:\2]-{\3}", query)
-  # print("Fixed query: ", query)
-  return query
+    query = re.sub(r"-\[(.*?):(\w+)\*(\d+)\.\.(\d+)\]->", r"-[\1:\2]->{\3,\4}", query)
+    query = re.sub(r"-\[(.*?):(\w+)\*(\d+)\]->", r"-[\1:\2]->{\3}", query)
+    query = re.sub(r"<-\[(.*?):(\w+)\*(\d+)\.\.(\d+)\]-", r"<-[\1:\2]-{\3,\4}", query)
+    query = re.sub(r"<-\[(.*?):(\w+)\*(\d+)\]-", r"<-[\1:\2]-{\3}", query)
+    query = re.sub(r"-\[(.*?):(\w+)\*(\d+)\.\.(\d+)\]-", r"-[\1:\2]-{\3,\4}", query)
+    query = re.sub(r"-\[(.*?):(\w+)\*(\d+)\]-", r"-[\1:\2]-{\3}", query)
+    # print("Fixed query: ", query)
+    return query
 
 
 def extract_gql(text: str) -> str:
-  """Extract GQL query from a text.
+    """Extract GQL query from a text.
 
-  Args:
-      text: Text to extract GQL query from.
+    Args:
+        text: Text to extract GQL query from.
 
-  Returns:
-      GQL query extracted from the text.
-  """
-  pattern = r"```(.*?)```"
-  matches = re.findall(pattern, text, re.DOTALL)
-  query = matches[0] if matches else text
-  return fix_gql_syntax(query)
+    Returns:
+        GQL query extracted from the text.
+    """
+    pattern = r"```(.*?)```"
+    matches = re.findall(pattern, text, re.DOTALL)
+    query = matches[0] if matches else text
+    return fix_gql_syntax(query)

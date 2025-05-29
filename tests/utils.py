@@ -20,14 +20,11 @@ from llama_index.embeddings.google_genai import GoogleGenAIEmbedding
 from llama_index.llms.google_genai import GoogleGenAI
 from llama_index_spanner import SpannerPropertyGraphStore
 
-spanner_instance_id = (
-    os.environ.get("SPANNER_INSTANCE_ID") or "graphdb-spanner-llama"
-)
+spanner_instance_id = os.environ.get("SPANNER_INSTANCE_ID") or "graphdb-spanner-llama"
 spanner_database_id = (
     os.environ.get("SPANNER_DATABASE_ID") or "llama-index-integration-tests"
 )
 spanner_graph_name = os.environ.get("SPANNER_GRAPH_NAME") or "llama_index_graph"
-
 
 
 def get_spanner_property_graph_store(
@@ -35,17 +32,17 @@ def get_spanner_property_graph_store(
     use_flexible_schema: bool = False,
     clean_up: bool = False,
 ) -> SpannerPropertyGraphStore:
-  """Get a SpannerPropertyGraphStore instance for testing."""
-  graph_name = spanner_graph_name
-  if graph_name_suffix:
-    graph_name += "_" + graph_name_suffix
-  return SpannerPropertyGraphStore(
-      instance_id=spanner_instance_id,
-      database_id=spanner_database_id,
-      graph_name=graph_name,
-      clean_up=clean_up,
-      use_flexible_schema=use_flexible_schema,
-  )
+    """Get a SpannerPropertyGraphStore instance for testing."""
+    graph_name = spanner_graph_name
+    if graph_name_suffix:
+        graph_name += "_" + graph_name_suffix
+    return SpannerPropertyGraphStore(
+        instance_id=spanner_instance_id,
+        database_id=spanner_database_id,
+        graph_name=graph_name,
+        clean_up=clean_up,
+        use_flexible_schema=use_flexible_schema,
+    )
 
 
 def get_resources(
@@ -53,20 +50,20 @@ def get_resources(
     use_flexible_schema: bool = False,
     clean_up: bool = False,
 ):
-  """Get the resources for testing."""
-  graph_store = get_spanner_property_graph_store(
-      graph_name_suffix, use_flexible_schema, clean_up
-  )
-  storage_context = StorageContext.from_defaults(graph_store=graph_store)
-  llm = GoogleGenAI(
-      model="gemini-2.0-flash",
-  )
-  embed_model = GoogleGenAIEmbedding(
-      model_name="text-embedding-004", embed_batch_size=100
-  )
-  return graph_store, storage_context, llm, embed_model
+    """Get the resources for testing."""
+    graph_store = get_spanner_property_graph_store(
+        graph_name_suffix, use_flexible_schema, clean_up
+    )
+    storage_context = StorageContext.from_defaults(graph_store=graph_store)
+    llm = GoogleGenAI(
+        model="gemini-2.0-flash",
+    )
+    embed_model = GoogleGenAIEmbedding(
+        model_name="text-embedding-004", embed_batch_size=100
+    )
+    return graph_store, storage_context, llm, embed_model
 
 
 def get_random_suffix() -> str:
-  """Get a random suffix for testing."""
-  return str(random.randint(1000000, 9999999))
+    """Get a random suffix for testing."""
+    return str(random.randint(1000000, 9999999))

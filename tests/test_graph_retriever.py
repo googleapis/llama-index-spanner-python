@@ -31,187 +31,187 @@ from tests.utils import get_resources
 
 
 def setup(schema_type):
-  """Setup the index for integration tests."""
-  graph_store, _, llm, embed_model = get_resources(
-      schema_type, clean_up=True, use_flexible_schema=schema_type == "flexible"
-  )
+    """Setup the index for integration tests."""
+    graph_store, _, llm, embed_model = get_resources(
+        schema_type, clean_up=True, use_flexible_schema=schema_type == "flexible"
+    )
 
-  loader = WikipediaReader()
-  documents = loader.load_data(pages=["Google"], auto_suggest=False)
+    loader = WikipediaReader()
+    documents = loader.load_data(pages=["Google"], auto_suggest=False)
 
-  PropertyGraphIndex.from_documents(
-      documents,
-      embed_model=embed_model,
-      embed_kg_nodes=True,
-      kg_extractors=[
-          SchemaLLMPathExtractor(
-              llm=llm,
-              max_triplets_per_chunk=1000,
-              num_workers=4,
-          )
-      ],
-      llm=llm,
-      show_progress=True,
-      property_graph_store=graph_store,
-  )
+    PropertyGraphIndex.from_documents(
+        documents,
+        embed_model=embed_model,
+        embed_kg_nodes=True,
+        kg_extractors=[
+            SchemaLLMPathExtractor(
+                llm=llm,
+                max_triplets_per_chunk=1000,
+                num_workers=4,
+            )
+        ],
+        llm=llm,
+        show_progress=True,
+        property_graph_store=graph_store,
+    )
 
 
 def load(schema_type):
-  """Load the retriever for integration tests."""
-  graph_store, _, llm, embed_model = get_resources(
-      schema_type, clean_up=False, use_flexible_schema=schema_type == "flexible"
-  )
-  Settings.llm = llm
+    """Load the retriever for integration tests."""
+    graph_store, _, llm, embed_model = get_resources(
+        schema_type, clean_up=False, use_flexible_schema=schema_type == "flexible"
+    )
+    Settings.llm = llm
 
-  index = PropertyGraphIndex.from_existing(
-      llm=llm, embed_model=embed_model, property_graph_store=graph_store
-  )
-  retriever = SpannerGraphCustomRetriever(
-      graph_store=index.property_graph_store,
-      embed_model=embed_model,
-      llm=llm,
-      include_raw_response_as_metadata=True,
-      verbose=True,
-  )
-  return retriever
+    index = PropertyGraphIndex.from_existing(
+        llm=llm, embed_model=embed_model, property_graph_store=graph_store
+    )
+    retriever = SpannerGraphCustomRetriever(
+        graph_store=index.property_graph_store,
+        embed_model=embed_model,
+        llm=llm,
+        include_raw_response_as_metadata=True,
+        verbose=True,
+    )
+    return retriever
 
 
 def test_graph_retriever():
-  """Test the graph retriever."""
-  for schema_type in ["static", "flexible"]:
-    # setup(schema_type)
-    retriever = load(schema_type)
+    """Test the graph retriever."""
+    for schema_type in ["static", "flexible"]:
+        # setup(schema_type)
+        retriever = load(schema_type)
 
-    query_engine = RetrieverQueryEngine(retriever=retriever)
-    response = query_engine.query("what is parent company of Google?")
-    print(response)
-    response = query_engine.query("Where are all the Google offices located?")
-    print(response)
-    response = query_engine.query("Some Products of Google?")
-    print(response)
+        query_engine = RetrieverQueryEngine(retriever=retriever)
+        response = query_engine.query("what is parent company of Google?")
+        print(response)
+        response = query_engine.query("Where are all the Google offices located?")
+        print(response)
+        response = query_engine.query("Some Products of Google?")
+        print(response)
 
 
 def setup2(schema_type):
-  graph_store, _, llm, embed_model = get_resources(
-      schema_type + "_2",
-      clean_up=True,
-      use_flexible_schema=schema_type == "flexible",
-  )
-  Settings.llm = llm
+    graph_store, _, llm, embed_model = get_resources(
+        schema_type + "_2",
+        clean_up=True,
+        use_flexible_schema=schema_type == "flexible",
+    )
+    Settings.llm = llm
 
-  nodes = [
-      EntityNode(
-          name="Elias Thorne",
-          label="Person",
-          properties={
-              "name": "Elias Thorne",
-              "description": "lived in the desert",
-          },
-      ),
-      EntityNode(
-          name="Zephyr",
-          label="Animal",
-          properties={"name": "Zephyr", "description": "pet falcon"},
-      ),
-      EntityNode(
-          name="Elara",
-          label="Person",
-          properties={
-              "name": "Elara",
-              "description": "resided in the capital city",
-          },
-      ),
-      EntityNode(name="Desert", label="Location", properties={}),
-      EntityNode(name="Capital City", label="Location", properties={}),
-      ChunkNode(
-          text=(
-              "Elias Thorne lived in the desert. He was a skilled craftsman who"
-              " worked with sandstone. Elias had a pet falcon named Zephyr. His"
-              " sister, Elara, resided in the capital city and ran a spice"
-              " shop. They rarely met due to the distance."
-          )
-      ),
-  ]
-  for node in nodes:
-    node.embedding = embed_model.get_text_embedding(str(node))
+    nodes = [
+        EntityNode(
+            name="Elias Thorne",
+            label="Person",
+            properties={
+                "name": "Elias Thorne",
+                "description": "lived in the desert",
+            },
+        ),
+        EntityNode(
+            name="Zephyr",
+            label="Animal",
+            properties={"name": "Zephyr", "description": "pet falcon"},
+        ),
+        EntityNode(
+            name="Elara",
+            label="Person",
+            properties={
+                "name": "Elara",
+                "description": "resided in the capital city",
+            },
+        ),
+        EntityNode(name="Desert", label="Location", properties={}),
+        EntityNode(name="Capital City", label="Location", properties={}),
+        ChunkNode(
+            text=(
+                "Elias Thorne lived in the desert. He was a skilled craftsman who"
+                " worked with sandstone. Elias had a pet falcon named Zephyr. His"
+                " sister, Elara, resided in the capital city and ran a spice"
+                " shop. They rarely met due to the distance."
+            )
+        ),
+    ]
+    for node in nodes:
+        node.embedding = embed_model.get_text_embedding(str(node))
 
-  relations = [
-      Relation(
-          source_id=nodes[0].id,
-          target_id=nodes[3].id,
-          label="LivesIn",
-          properties={},
-      ),
-      Relation(
-          source_id=nodes[0].id,
-          target_id=nodes[1].id,
-          label="Owns",
-          properties={},
-      ),
-      Relation(
-          source_id=nodes[2].id,
-          target_id=nodes[4].id,
-          label="LivesIn",
-          properties={},
-      ),
-      Relation(
-          source_id=nodes[0].id,
-          target_id=nodes[2].id,
-          label="Sibling",
-          properties={},
-      ),
-  ]
+    relations = [
+        Relation(
+            source_id=nodes[0].id,
+            target_id=nodes[3].id,
+            label="LivesIn",
+            properties={},
+        ),
+        Relation(
+            source_id=nodes[0].id,
+            target_id=nodes[1].id,
+            label="Owns",
+            properties={},
+        ),
+        Relation(
+            source_id=nodes[2].id,
+            target_id=nodes[4].id,
+            label="LivesIn",
+            properties={},
+        ),
+        Relation(
+            source_id=nodes[0].id,
+            target_id=nodes[2].id,
+            label="Sibling",
+            properties={},
+        ),
+    ]
 
-  graph_store.upsert_nodes(nodes)
-  graph_store.upsert_relations(relations)
+    graph_store.upsert_nodes(nodes)
+    graph_store.upsert_relations(relations)
 
-  retriver = SpannerGraphCustomRetriever(
-      graph_store=graph_store,
-      embed_model=embed_model,
-      llm=llm,
-      include_raw_response_as_metadata=True,
-      verbose=True,
-  )
+    retriver = SpannerGraphCustomRetriever(
+        graph_store=graph_store,
+        embed_model=embed_model,
+        llm=llm,
+        include_raw_response_as_metadata=True,
+        verbose=True,
+    )
 
-  retriver2 = SpannerGraphTextToGQLRetriever(
-      graph_store=graph_store,
-      llm=llm,
-      include_raw_response_as_metadata=True,
-      verbose=True,
-  )
+    retriver2 = SpannerGraphTextToGQLRetriever(
+        graph_store=graph_store,
+        llm=llm,
+        include_raw_response_as_metadata=True,
+        verbose=True,
+    )
 
-  return retriver, retriver2, graph_store
+    return retriver, retriver2, graph_store
 
 
 @pytest.fixture
 def retrievers_static():
-  retriever, retriever2, graph_store = setup2("static")
-  yield retriever, retriever2
-  graph_store.clean_up()
+    retriever, retriever2, graph_store = setup2("static")
+    yield retriever, retriever2
+    graph_store.clean_up()
 
 
 @pytest.fixture
 def retrievers_dynamic():
-  retriever, retriever2, graph_store = setup2("flexible")
-  yield retriever, retriever2
-  graph_store.clean_up()
+    retriever, retriever2, graph_store = setup2("flexible")
+    yield retriever, retriever2
+    graph_store.clean_up()
 
 
 def test_graph_retriever2_static(retrievers_static):
-  """Test the graph retriever."""
-  for retriever in retrievers_static:
+    """Test the graph retriever."""
+    for retriever in retrievers_static:
+        res = retriever.retrieve("Where does Elias Thorne's sibling live?")
+        assert "Capital City" in str(res)
+
+        res = retriever.retrieve("Who lives in desert?")
+        assert "Elias Thorne" in str(res)
+
+
+def test_graph_retriever2_dynamic(retrievers_dynamic):
+    """Test the graph retriever."""
+    retriever = retrievers_dynamic[0]  # only NL2GQL fails
     res = retriever.retrieve("Where does Elias Thorne's sibling live?")
     assert "Capital City" in str(res)
 
     res = retriever.retrieve("Who lives in desert?")
     assert "Elias Thorne" in str(res)
-
-
-def test_graph_retriever2_dynamic(retrievers_dynamic):
-  """Test the graph retriever."""
-  retriever = retrievers_dynamic[0]  # only NL2GQL fails
-  res = retriever.retrieve("Where does Elias Thorne's sibling live?")
-  assert "Capital City" in str(res)
-
-  res = retriever.retrieve("Who lives in desert?")
-  assert "Elias Thorne" in str(res)
