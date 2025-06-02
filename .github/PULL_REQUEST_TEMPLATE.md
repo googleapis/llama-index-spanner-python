@@ -1,6 +1,8 @@
-Fixes #<issue_number_goes_here>
+Thank you for opening a Pull Request! Before submitting your PR, there are a few things you can do to make sure it goes smoothly:
+- [ ] Make sure to open an issue before writing your code! That way we can discuss the change, evaluate designs, and agree on the general idea
+- [ ] Follow the [Samples Style Guide](https://googlecloudplatform.github.io/samples-style-guide/)
+- [ ] Ensure the tests and linter pass
+- [ ] Communicate test infrastructure changes, i.e. API enablement, secrets
+- [ ] Appropriate docs were updated (if necessary)
 
-> It's a good idea to open an issue first for discussion.
-
-- [ ] Tests pass
-- [ ] Appropriate changes to documentation are included in the PR
+🛠️ Fixes #<issue_number_goes_here>
