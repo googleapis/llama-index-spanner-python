@@ -14,7 +14,9 @@
 
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Tuple
+
 from google.cloud import spanner
+
 from .type_utils import TypeUtility
 
 MUTATION_BATCH_SIZE = 1000

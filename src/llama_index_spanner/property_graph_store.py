@@ -17,25 +17,16 @@ import json
 from typing import Any, Dict, List, Optional, Tuple
 
 from google.cloud import spanner
-from llama_index.core.graph_stores.types import (
-    ChunkNode,
-    EntityNode,
-    LabelledNode,
-    PropertyGraphStore,
-    Relation,
-    Triplet,
-)
+from llama_index.core.graph_stores.types import (ChunkNode, EntityNode,
+                                                 LabelledNode,
+                                                 PropertyGraphStore, Relation,
+                                                 Triplet)
 from llama_index.core.prompts import PromptTemplate, PromptType
 from llama_index.core.vector_stores.types import VectorStoreQuery
 
 from .prompts import DEFAULT_SPANNER_GQL_TEMPLATE
-from .schema import (
-    ElementSchema,
-    GraphDocumentUtility,
-    SpannerGraphSchema,
-    group_edges,
-    group_nodes,
-)
+from .schema import (ElementSchema, GraphDocumentUtility, SpannerGraphSchema,
+                     group_edges, group_nodes)
 from .spanner import SpannerImpl, SpannerInterface, client_with_user_agent
 from .version import __version__
 

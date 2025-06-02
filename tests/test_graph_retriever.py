@@ -12,21 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from llama_index.core import PropertyGraphIndex
-from llama_index.core import Settings
-from llama_index.core.graph_stores.types import (
-    ChunkNode,
-    EntityNode,
-    Relation,
-)
+import pytest
+from llama_index.core import PropertyGraphIndex, Settings
+from llama_index.core.graph_stores.types import ChunkNode, EntityNode, Relation
 from llama_index.core.indices.property_graph import SchemaLLMPathExtractor
 from llama_index.core.query_engine import RetrieverQueryEngine
 from llama_index.readers.wikipedia import WikipediaReader
-import pytest
+
 from llama_index_spanner.graph_retriever import (
-    SpannerGraphCustomRetriever,
-    SpannerGraphTextToGQLRetriever,
-)
+    SpannerGraphCustomRetriever, SpannerGraphTextToGQLRetriever)
 from tests.utils import get_resources
 
 

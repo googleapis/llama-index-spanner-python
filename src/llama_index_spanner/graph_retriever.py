@@ -21,23 +21,16 @@ from llama_index.core.llms import LLM
 from llama_index.core.output_parsers import PydanticOutputParser
 from llama_index.core.postprocessor.llm_rerank import LLMRerank
 from llama_index.core.prompts import PromptType
-from llama_index.core.retrievers import (
-    CustomPGRetriever,
-    VectorContextRetriever,
-)
+from llama_index.core.retrievers import (CustomPGRetriever,
+                                         VectorContextRetriever)
 from llama_index.core.schema import NodeWithScore, QueryBundle, TextNode
 from llama_index.core.vector_stores.types import VectorStore
 from pydantic import BaseModel
 
 from .graph_utils import extract_gql, fix_gql_syntax
-from .prompts import (
-    DEFAULT_GQL_FIX_TEMPLATE,
-    DEFAULT_GQL_VERIFY_TEMPLATE,
-    DEFAULT_SPANNER_GQL_TEMPLATE,
-    DEFAULT_SUMMARY_TEMPLATE,
-)
+from .prompts import (DEFAULT_GQL_FIX_TEMPLATE, DEFAULT_GQL_VERIFY_TEMPLATE,
+                      DEFAULT_SPANNER_GQL_TEMPLATE, DEFAULT_SUMMARY_TEMPLATE)
 from .property_graph_store import SpannerPropertyGraphStore
-
 
 GQL_GENERATION_PROMPT = PromptTemplate(
     template=DEFAULT_SPANNER_GQL_TEMPLATE,
