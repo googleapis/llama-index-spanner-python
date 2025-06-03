@@ -44,65 +44,73 @@ virtualenv <your-env>
 <your-env>\Scripts\pip.exe install llama-index-spanner
 ```
 
-<!-- ### Spanner Property Graph Store Usage
+ ### Spanner Property Graph Store Usage
 
 Use `SpannerPropertyGraphStore` to store nodes and edges extracted from documents.
 
 ```python
 from llama_index_spanner import SpannerPropertyGraphStore
 
-graph = SpannerPropertyGraphStore(
+graph_store = SpannerPropertyGraphStore(
     instance_id="my-instance",
     database_id="my-database",
     graph_name="my_graph",
 )
 ```
 
-See the full [Spanner Graph Store](https://github.com/googleapis/langchain-google-spanner-python/blob/main/docs/graph_store.ipynb) tutorial.
+See the full [Spanner Graph Store](https://github.com/googleapis/llama-index-spanner-python/blob/main/docs/property_graph_store.ipynb) tutorial.
 
 ### Spanner Graph Retrievers Usage
 
-Use `SpannerGraphTextToGQLRetriever` to translate natural language question to GQL and query SpannerGraphStore.
+Use `SpannerGraphTextToGQLRetriever` to translate natural language question to GQL and query SpannerPropertyGraphStore.
 
 ```python
-from langchain_google_spanner import SpannerGraphStore, SpannerGraphTextToGQLRetriever
-from langchain_google_vertexai import ChatVertexAI
+from llama_index_spanner import (
+    SpannerPropertyGraphStore,
+    SpannerGraphTextToGQLRetriever,
+)
+from llama_index.llms.google_genai import GoogleGenAI
 
-graph = SpannerGraphStore(
+graph_store = SpannerPropertyGraphStore(
     instance_id="my-instance",
     database_id="my-database",
     graph_name="my_graph",
 )
-llm = ChatVertexAI()
-retriever = SpannerGraphTextToGQLRetriever.from_params(
-    graph_store=graph,
-    llm=llm
+llm = GoogleGenAI(
+    model="gemini-2.0-flash",
 )
-retriever.invoke("Where does Elias Thorne's sibling live?")
+retriever = SpannerGraphTextToGQLRetriever(graph_store=graph_store, llm=llm)
+retriever.retrieve("Where does Elias Thorne's sibling live?")
+
 ```
 
-Use `SpannerGraphVectorContextRetriever` to perform vector search on embeddings that are stored in the nodes in a SpannerGraphStore. If expand\_by\_hops is provided, the nodes and edges at a distance upto the expand\_by\_hops from the nodes found in the vector search will also be returned.
+Use `SpannerGraphCustomRetriever` to query your SpannerPropertyGraphStore with a hybrid approach, combining natural language to GQL translation with vector search capabilities.
 
 ```python
-from langchain_google_spanner import SpannerGraphStore, SpannerGraphVectorContextRetriever
-from langchain_google_vertexai import ChatVertexAI, VertexAIEmbeddings
+from llama_index_spanner import SpannerPropertyGraphStore, SpannerGraphCustomRetriever
+from llama_index.llms.google_genai import GoogleGenAI
+from llama_index.embeddings.google_genai import GoogleGenAIEmbedding
 
-graph = SpannerGraphStore(
+graph_store = SpannerPropertyGraphStore(
     instance_id="my-instance",
     database_id="my-database",
     graph_name="my_graph",
 )
-embedding_service = VertexAIEmbeddings(model_name="text-embedding-004")
-retriever = SpannerGraphVectorContextRetriever.from_params(
-            graph_store=graph,
-            embedding_service=embedding_service,
-            label_expr="Person",
-            embeddings_column="embeddings",
-            top_k=1,
-            expand_by_hops=1,
-        )
-retriever.invoke("Who lives in desert?")
-``` -->
+llm = GoogleGenAI(
+    model="gemini-2.0-flash",
+)
+embed_model = GoogleGenAIEmbedding(model_name="text-embedding-004")
+retriever = SpannerGraphCustomRetriever(
+    similarity_top_k=4,
+    path_depth=2,
+    graph_store=graph_store,
+    llm=llm,
+    embed_model=embed_model,
+)
+retriever.retriever("Who lives in desert?")
+```
+
+See the full [Spanner Graph Retrievers](https://github.com/googleapis/llama-index-spanner-python/blob/main/docs/graph_retriver.ipynb) tutorial.
 
 ## Contributing
 
