@@ -110,7 +110,7 @@ retriever = SpannerGraphCustomRetriever(
 retriever.retriever("Who lives in desert?")
 ```
 
-See the full [Spanner Graph Retrievers](https://github.com/googleapis/llama-index-spanner-python/blob/main/docs/graph_retriver.ipynb) tutorial.
+See the full [Spanner Graph Retrievers](https://github.com/googleapis/llama-index-spanner-python/blob/main/docs/graph_retriever.ipynb) tutorial.
 
 ## Contributing
 

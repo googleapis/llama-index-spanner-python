@@ -220,11 +220,7 @@ DEFAULT_GQL_FIX_TEMPLATE = (
 )
 
 
-DEFAULT_SUMMARY_TEMPLATE = """You are an assistant that helps to form nice and human understandable answers.
-The information part contains the provided information you must use to construct an answer.
-The provided information is authoritative, never doubt it or try to use your internal knowledge to correct it.
-If the provided information is empty, say that you don't know the answer.
-Make the answer sound as a response to the question. Do not mention that you based the result on the given information.
+SUMMARY_EXAMPLES = """
 Here is an example:
 
 Question: How many miles is the flight between the ANC and SEA airports?
@@ -232,7 +228,20 @@ Information:
 [{"r.dist": 1440}]
 Helpful Answer:
 It is 1440 miles to fly between the ANC and SEA airports.
+"""
 
+DEFAULT_SUMMARY_TEMPLATE_PART0 = """
+You are an assistant that helps to form nice and human understandable answers.
+The information part contains the provided information you must use to construct an answer.
+The provided information is authoritative, never doubt it or try to use your internal knowledge to correct it.
+If the provided information is empty, say that you don't know the answer.
+Make the answer sound as a response to the question. Do not mention that you based the result on the given information.
+
+{summary_examples}
+
+"""
+
+DEFAULT_SUMMARY_TEMPLATE_PART1 = """
 Follow this example when generating answers.
 Question:
 {question}
@@ -240,3 +249,9 @@ Information:
 {context}
 Helpful Answer:
 """
+
+DEFAULT_SUMMARY_TEMPLATE = (
+    DEFAULT_SUMMARY_TEMPLATE_PART0.format(summary_examples=SUMMARY_EXAMPLES)
+    + DEFAULT_SUMMARY_TEMPLATE_PART1
+)
+

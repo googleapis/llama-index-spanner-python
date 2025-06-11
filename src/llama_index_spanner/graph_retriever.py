@@ -86,12 +86,12 @@ class SpannerGraphTextToGQLRetriever(BasePGRetriever):
           text_to_gql_prompt: The prompt to use for generating the GQL query.
           response_template: The template to use for formatting the response.
           gql_validator: A function to validate the GQL query.
-          include_raw_response_as_metadata: Whether to include the raw response as
+          include_raw_response_as_metadata: If true, includes the raw response as
             metadata.
           max_gql_fix_retries: The maximum number of retries for fixing the GQL
             query.
-          verify_gql: Whether to verify the GQL query.
-          summarize_response: Whether to summarize the response.
+          verify_gql: If true, verifies the generated GQL query.
+          summarize_response: If true, summarizes the response.
           summarization_template: The template to use for summarizing the response.
           **kwargs: Additional keyword arguments.
 
@@ -116,12 +116,12 @@ class SpannerGraphTextToGQLRetriever(BasePGRetriever):
         self.max_gql_fix_retries = max_gql_fix_retries
         self.verify_gql = verify_gql
         self.summarize_response = summarize_response
-        self.summarization_template = summarization_template or DEFAULT_SUMMARY_TEMPLATE
+        self.summarization_template = summarization_template or DEFAULT_GQL_SUMMARY_TEMPLATE
         super().__init__(
             graph_store=graph_store, include_text=False, include_properties=False
         )
 
-    def _parse_generated_gql(self, gql_query: str) -> str:
+    def _validate_generated_gql(self, gql_query: str) -> str:
         if self.gql_validator is not None:
             return self.gql_validator(gql_query)
         return gql_query
@@ -157,7 +157,7 @@ class SpannerGraphTextToGQLRetriever(BasePGRetriever):
                     schema=self.graph_store.get_schema_str(),
                 )
                 gql_query = extract_gql(fixed_gql_query)
-                gql_query = self._parse_generated_gql(gql_query)
+                gql_query = self._validate_generated_gql(gql_query)
             finally:
                 retries += 1
         return "", []
@@ -185,20 +185,19 @@ class SpannerGraphTextToGQLRetriever(BasePGRetriever):
             question=question,
         )
         gql_query = extract_gql(response)
-        generated_gql = self._parse_generated_gql(gql_query)
+        generated_gql = self._validate_generated_gql(gql_query)
 
         # 2. Verify gql query using LLM
         if self.verify_gql:
-            verify_response = (
-                self.llm.predict(
-                    GQL_VERIFY_PROMPT,
-                    question=question,
-                    generated_gql=generated_gql,
-                    schema=schema_str,
-                    format_instructions=GQL_VERIFY_PROMPT.output_parser.format_string,
-                ),
+            verify_response = self.llm.predict(
+                GQL_VERIFY_PROMPT,
+                question=question,
+                generated_gql=generated_gql,
+                schema=schema_str,
+                format_instructions=GQL_VERIFY_PROMPT.output_parser.format_string,
             )
-            output_parser = verify_gql_output_parser.parse(verify_response[0])
+    
+            output_parser = verify_gql_output_parser.parse(verify_response)
             verified_gql = fix_gql_syntax(output_parser.verified_gql)
         else:
             verified_gql = generated_gql
@@ -244,7 +243,7 @@ class SpannerGraphTextToGQLRetriever(BasePGRetriever):
 
 
 class SpannerGraphCustomRetriever(CustomPGRetriever):
-    """Custom retriever with cohere reranking."""
+    """Custom retriever that combines VectorContextRetriever and SpannerGraphTextToGQLRetriever, then reranks the results."""
 
     def init(
         self,
@@ -254,7 +253,7 @@ class SpannerGraphCustomRetriever(CustomPGRetriever):
         similarity_top_k: int = 4,
         path_depth: int = 2,
         ## text-to-gql params
-        llm: Optional[LLM] = None,
+        llm_text_to_gql: Optional[LLM] = None,
         text_to_gql_prompt: Optional[PromptTemplate] = None,
         response_template: Optional[str] = None,
         gql_validator: Optional[Callable[[str], bool]] = None,
@@ -263,9 +262,10 @@ class SpannerGraphCustomRetriever(CustomPGRetriever):
         verify_gql: Optional[bool] = True,
         summarize_response: Optional[bool] = False,
         summarization_template: Optional[Union[PromptTemplate, str]] = None,
-        ## cohere reranker params
-        cohere_api_key: Optional[str] = None,
-        cohere_top_n: int = 2,
+        ## LLM reranker params
+        llm_for_reranker: Optional[LLM] = None,
+        choice_batch_size: int = 5,
+        llmranker_top_n: int = 2,
         **kwargs: Any,
     ) -> None:
         """Initializes the custom retriever.
@@ -275,7 +275,7 @@ class SpannerGraphCustomRetriever(CustomPGRetriever):
           vector_store: The vector store to use.
           similarity_top_k: The number of top nodes to retrieve.
           path_depth: The depth of the path to retrieve.
-          llm: The LLM to use.
+          llm_text_to_gql: The LLM to use for text to GQL conversion.
           text_to_gql_prompt: The prompt to use for generating the GQL query.
           response_template: The template to use for formatting the response.
           gql_validator: A function to validate the GQL query.
@@ -286,8 +286,9 @@ class SpannerGraphCustomRetriever(CustomPGRetriever):
           verify_gql: Whether to verify the GQL query.
           summarize_response: Whether to summarize the response.
           summarization_template: The template to use for summarizing the response.
-          cohere_api_key: The Cohere API key.
-          cohere_top_n: The number of top nodes to return.
+          llm_for_reranker: The LLM to use in reranking.
+          choice_batch_size: Batch size for choice select in LLM Reranker.
+          llmranker_top_n: The number of top nodes to return.
           **kwargs: Additional keyword arguments.
         """
         self.vector_retriever = VectorContextRetriever(
@@ -301,7 +302,7 @@ class SpannerGraphCustomRetriever(CustomPGRetriever):
 
         self.nl_to_gql_retriever = SpannerGraphTextToGQLRetriever(
             graph_store=self._graph_store,
-            llm=llm,
+            llm=llm_text_to_gql,
             text_to_gql_prompt=text_to_gql_prompt,
             response_template=response_template,
             gql_validator=gql_validator,
@@ -311,10 +312,10 @@ class SpannerGraphCustomRetriever(CustomPGRetriever):
             summarize_response=summarize_response,
             summarization_template=summarization_template,
         )
-        self.reranker = LLMRerank(choice_batch_size=5, top_n=cohere_top_n)
+        self.reranker = LLMRerank(llm=llm_for_reranker, choice_batch_size=choice_batch_size, top_n=llmranker_top_n)
 
     def custom_retrieve(self, query_str: str) -> str:
-        """Custom retrieve.
+        """Custom retrieve function that combines vector and NL2GQL retrieval, then reranks the results.
 
         Args:
             query_str: The query string.
@@ -322,8 +323,9 @@ class SpannerGraphCustomRetriever(CustomPGRetriever):
         Returns:
             The final text response.
         """
-        nodes_1 = self.vector_retriever.retrieve(query_str)
+
         query_bundle = QueryBundle(query_str=query_str)
+        nodes_1 = self.vector_retriever.retrieve_from_graph(query_bundle)
         nodes_2 = self.nl_to_gql_retriever.retrieve_from_graph(query_bundle)
         reranked_nodes = self.reranker.postprocess_nodes(
             nodes_1 + nodes_2, query_bundle
