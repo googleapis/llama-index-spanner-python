@@ -18,8 +18,8 @@ from .property_graph_store import SpannerPropertyGraphStore
 from .version import __version__
 
 __all__ = [
-    __version__,
-    SpannerPropertyGraphStore,
-    SpannerGraphTextToGQLRetriever,
-    SpannerGraphCustomRetriever,
+    "__version__",
+    "SpannerPropertyGraphStore",
+    "SpannerGraphTextToGQLRetriever",
+    "SpannerGraphCustomRetriever",
 ]

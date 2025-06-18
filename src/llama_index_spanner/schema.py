@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import json
 import re
-from typing import Any, Dict, Generator, Iterable, List, Optional, Tuple
+from typing import Any, Dict, Generator, Iterable, List, Optional, Sequence, Tuple
 
 from google.cloud.spanner_v1 import JsonObject, param_types
 from llama_index.core.graph_stores.types import (ChunkNode, EntityNode,
@@ -34,7 +34,7 @@ def remove_empty_values(input_dict):
 
 
 def group_nodes(
-    nodes: List[LabelledNode],
+    nodes: Sequence[LabelledNode],
 ) -> Dict[str, List[LabelledNode]]:
     """Groups nodes by their respective types.
 

@@ -65,7 +65,7 @@ class SpannerInterface(ABC):
 
     @abstractmethod
     def insert_or_update(
-        self, table: str, columns: Tuple[str], values: List[List[Any]]
+        self, table: str, columns: Tuple[str, ...], values: List[List[Any]]
     ) -> None:
         """Insert or update the table.
 
@@ -130,7 +130,7 @@ class SpannerImpl(SpannerInterface):
         return op.result(options.get("timeout", DEFAULT_DDL_TIMEOUT))
 
     def insert_or_update(
-        self, table: str, columns: Tuple[str], values: List[List[Any]]
+        self, table: str, columns: Tuple[str, ...], values: List[List[Any]]
     ) -> None:
         for i in range(0, len(values), MUTATION_BATCH_SIZE):
             value_batch = values[i : i + MUTATION_BATCH_SIZE]
