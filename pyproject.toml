@@ -21,6 +21,9 @@ llama-index-readers-wikipedia = "^0.3.0"
 wikipedia = "^1.4.0"
 llama-index-embeddings-google-genai = "^0.1.0"
 ipykernel = "^6.29.5"
+black = {extras = ["jupyter"], version = "^25.1.0"}
+isort = "^6.0.1"
+mypy = "^1.16.0"
 
 [build-system]
 requires = ["poetry-core"]
