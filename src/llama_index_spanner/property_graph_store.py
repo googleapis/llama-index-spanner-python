@@ -16,7 +16,7 @@ import itertools
 import json
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-from google.cloud import spanner
+from google.cloud import spanner # type: ignore
 from llama_index.core.graph_stores.types import (ChunkNode, EntityNode,
                                                  LabelledNode,
                                                  PropertyGraphStore, Relation,
