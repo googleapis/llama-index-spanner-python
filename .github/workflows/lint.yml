@@ -50,7 +50,7 @@ jobs:
       - name: Run linters
         run: |
           black --check .
-          isort --check --profile black .
+          isort --check .
 
       # - name: Run type-check
       #   run: mypy --install-types --non-interactive .
