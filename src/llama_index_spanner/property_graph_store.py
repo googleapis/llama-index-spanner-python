@@ -26,7 +26,7 @@ from llama_index.core.graph_stores.types import (
     Triplet,
 )
 from llama_index.core.prompts import PromptTemplate, PromptType
-from llama_index.core.vector_stores.types import VectorStoreQuery, MetadataFilter
+from llama_index.core.vector_stores.types import MetadataFilter, VectorStoreQuery
 
 from .prompts import DEFAULT_SPANNER_GQL_TEMPLATE
 from .schema import (
