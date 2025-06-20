@@ -16,18 +16,24 @@ from typing import Generator
 
 import pytest
 from llama_index.core.graph_stores.types import ChunkNode, EntityNode, Relation
-from llama_index.core.vector_stores.types import (ExactMatchFilter,
-                                                  FilterCondition,
-                                                  FilterOperator,
-                                                  MetadataFilter,
-                                                  MetadataFilters,
-                                                  VectorStoreQuery)
+from llama_index.core.vector_stores.types import (
+    ExactMatchFilter,
+    FilterCondition,
+    FilterOperator,
+    MetadataFilter,
+    MetadataFilters,
+    VectorStoreQuery,
+)
 
 from llama_index_spanner.property_graph_store import SpannerPropertyGraphStore
 from llama_index_spanner.schema import ElementSchema
-from tests.utils import (get_random_suffix, get_spanner_property_graph_store,
-                         spanner_database_id, spanner_graph_name,
-                         spanner_instance_id)
+from tests.utils import (
+    get_random_suffix,
+    get_spanner_property_graph_store,
+    spanner_database_id,
+    spanner_graph_name,
+    spanner_instance_id,
+)
 
 pytestmark = pytest.mark.skipif(
     (not spanner_instance_id or not spanner_database_id or not spanner_graph_name),
