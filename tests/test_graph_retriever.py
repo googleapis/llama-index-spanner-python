@@ -20,7 +20,9 @@ from llama_index.core.query_engine import RetrieverQueryEngine
 from llama_index.readers.wikipedia import WikipediaReader
 
 from llama_index_spanner.graph_retriever import (
-    SpannerGraphCustomRetriever, SpannerGraphTextToGQLRetriever)
+    SpannerGraphCustomRetriever,
+    SpannerGraphTextToGQLRetriever,
+)
 from tests.utils import get_resources
 
 

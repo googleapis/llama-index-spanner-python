@@ -25,3 +25,9 @@ ipykernel = "^6.29.5"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+target-version = ['py39']
+
+[tool.isort]
+profile = "black"
