@@ -16,17 +16,26 @@ import itertools
 import json
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-from google.cloud import spanner # type: ignore
-from llama_index.core.graph_stores.types import (ChunkNode, EntityNode,
-                                                 LabelledNode,
-                                                 PropertyGraphStore, Relation,
-                                                 Triplet)
+from google.cloud import spanner  # type: ignore
+from llama_index.core.graph_stores.types import (
+    ChunkNode,
+    EntityNode,
+    LabelledNode,
+    PropertyGraphStore,
+    Relation,
+    Triplet,
+)
 from llama_index.core.prompts import PromptTemplate, PromptType
 from llama_index.core.vector_stores.types import VectorStoreQuery, MetadataFilter
 
 from .prompts import DEFAULT_SPANNER_GQL_TEMPLATE
-from .schema import (ElementSchema, GraphDocumentUtility, SpannerGraphSchema,
-                     group_edges, group_nodes)
+from .schema import (
+    ElementSchema,
+    GraphDocumentUtility,
+    SpannerGraphSchema,
+    group_edges,
+    group_nodes,
+)
 from .spanner import SpannerImpl, SpannerInterface, client_with_user_agent
 from .version import __version__
 
@@ -48,7 +57,7 @@ def node_from_json(label: str, json_node_properties: Dict[str, Any]) -> Labelled
     Returns:
       A LabelledNode.
     """
-    id_, name, text, properties, embedding = '', '', '', {}, None
+    id_, name, text, properties, embedding = "", "", "", {}, None
     for k, v in json_node_properties.items():
         if k == ElementSchema.NODE_KEY_COLUMN_NAME:
             id_ = v
@@ -84,7 +93,7 @@ def edge_from_json(json_edge_properties: Dict[str, Any]) -> Relation:
     Returns:
       A Relation.
     """
-    source_id, target_id, properties, label = '', '', {}, ''
+    source_id, target_id, properties, label = "", "", {}, ""
     for k, v in json_edge_properties.items():
         if k == ElementSchema.NODE_KEY_COLUMN_NAME:
             source_id = v
@@ -601,7 +610,10 @@ class SpannerPropertyGraphStore(PropertyGraphStore):
                     ):
                         self.impl.delete(
                             self.schema.labels[edge_label].base_table_name,
-                            [[edge_id, edge_target_id, edge_label] for _, edge_id, edge_target_id, edge_label in edges],
+                            [
+                                [edge_id, edge_target_id, edge_label]
+                                for _, edge_id, edge_target_id, edge_label in edges
+                            ],
                         )
             else:
                 data = self.structured_query(
@@ -671,9 +683,11 @@ class SpannerPropertyGraphStore(PropertyGraphStore):
         if query.filters:
             cond = []
             for i, query_filter in enumerate(query.filters.filters):
-                if not isinstance(query_filter, MetadataFilter): # doesn't support nested MetadataFilters
+                if not isinstance(
+                    query_filter, MetadataFilter
+                ):  # doesn't support nested MetadataFilters
                     continue
-                
+
                 if (
                     query_filter.key not in self.schema.node_properties
                     and (property_prefix + query_filter.key)

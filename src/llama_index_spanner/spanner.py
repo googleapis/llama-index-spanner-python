@@ -15,7 +15,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Tuple
 
-from google.cloud import spanner # type: ignore
+from google.cloud import spanner  # type: ignore
 
 from .type_utils import TypeUtility
 
