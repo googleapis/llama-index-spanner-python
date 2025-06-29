@@ -26,7 +26,10 @@ branchProtectionRules:
 - pattern: main
   isAdminEnforced: true
   requiredStatusCheckContexts:
-    - 'cla/google'
+    - "cla/google"
+    - "lint"
+    - "conventionalcommits.org"
+    - "header-check"
   # - Add required status checks like presubmit tests
   requiredApprovingReviewCount: 1
   requiresCodeOwnerReviews: true
