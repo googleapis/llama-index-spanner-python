@@ -1,14 +1,29 @@
 [tool.poetry]
 name = "llama-index-spanner"
-version = "0.1.0"
+dynamic = ["version"]
 description = "LlamaIndex integrations for Google Cloud Spanner"
-authors = ["Google LLC <googleapis-packages@google.com>"]
 readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.9"
+authors = [
+    {name = "Google LLC", email = "googleapis-packages@google.com"}
+]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
 google-cloud-spanner = ">=3.41.0,<4.0.0"
 llama-index-core = "^0.12.0"
+
+classifiers = [
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
 
 
 [tool.poetry.group.dev.dependencies]
@@ -22,6 +37,22 @@ wikipedia = "^1.4.0"
 llama-index-embeddings-google-genai = "^0.1.0"
 ipykernel = "^6.29.5"
 
+[project.urls]
+Homepage = "https://github.com/googleapis/llama-index-spanner-python"
+Repository = "https://github.com/googleapis/llama-index-spanner-python.git"
+"Bug Tracker" = "https://github.com/googleapis/llama-index-spanner-python/issues"
+Changelog = "https://github.com/googleapis/llama-index-spanner-python/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+lint = [
+    "black[jupyter]==24.8.0",
+    "flake8==6.1.0",
+    "isort==5.13.2",
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "llama-index-spanner.version.__version__"}
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
@@ -31,3 +62,12 @@ target-version = ['py39']
 
 [tool.isort]
 profile = "black"
+
+[tool.mypy]
+python_version = 3.9
+warn_unused_configs = true
+
+exclude = [
+    'docs/*',
+    'noxfile.py'
+]
