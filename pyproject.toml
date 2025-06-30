@@ -1,4 +1,4 @@
-[tool.poetry]
+[project]
 name = "llama-index-spanner"
 dynamic = ["version"]
 description = "LlamaIndex integrations for Google Cloud Spanner"
