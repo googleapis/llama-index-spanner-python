@@ -29,7 +29,8 @@ from pydantic import BaseModel
 
 from .graph_utils import extract_gql, fix_gql_syntax
 from .prompts import (DEFAULT_GQL_FIX_TEMPLATE, DEFAULT_GQL_VERIFY_TEMPLATE,
-                      DEFAULT_SPANNER_GQL_TEMPLATE, DEFAULT_SUMMARY_TEMPLATE)
+                      DEFAULT_SPANNER_GQL_TEMPLATE, DEFAULT_SUMMARY_TEMPLATE,
+                      DEFAULT_SCORING_TEMPLATE, DEFAULT_SYNTHESIS_TEMPLATE)
 from .property_graph_store import SpannerPropertyGraphStore
 
 GQL_GENERATION_PROMPT = PromptTemplate(
@@ -58,6 +59,14 @@ GQL_FIX_PROMPT = PromptTemplate(
 
 DEFAULT_GQL_SUMMARY_TEMPLATE = PromptTemplate(
     template=DEFAULT_SUMMARY_TEMPLATE,
+)
+
+GQL_RESPONSE_SCORING_TEMPLATE = PromptTemplate(
+    template = DEFAULT_SCORING_TEMPLATE
+)
+
+GQL_SYNTHESIS_RESPONSE_TEMPLATE = PromptTemplate(
+    template = DEFAULT_SYNTHESIS_TEMPLATE
 )
 
 
@@ -162,6 +171,17 @@ class SpannerGraphTextToGQLRetriever(BasePGRetriever):
                 retries += 1
         return "", []
 
+    def calculate_score_for_predicted_response(
+        self, question: str, response: str
+    ) -> float:
+        gql_response_score = self.llm.predict(
+            GQL_RESPONSE_SCORING_TEMPLATE,
+            question=question,
+            retrieved_context=response
+        )
+        return gql_response_score
+
+
     def retrieve_from_graph(
         self, query_bundle: schema.QueryBundle
     ) -> list[schema.NodeWithScore]:
@@ -221,7 +241,8 @@ class SpannerGraphTextToGQLRetriever(BasePGRetriever):
             node_text = summarized_response
         else:
             node_text = str(responses)
-
+        
+        score = self.calculate_score_for_predicted_response(question, node_text)
         return [
             NodeWithScore(
                 node=TextNode(
@@ -232,7 +253,7 @@ class SpannerGraphTextToGQLRetriever(BasePGRetriever):
                         else {}
                     ),
                 ),
-                score=1.0,
+                score=score,
             )
         ]
 
@@ -291,6 +312,7 @@ class SpannerGraphCustomRetriever(CustomPGRetriever):
           llmranker_top_n: The number of top nodes to return.
           **kwargs: Additional keyword arguments.
         """
+        self.llm = llm_text_to_gql
         self.vector_retriever = VectorContextRetriever(
             graph_store=self._graph_store,
             include_text=self.include_text,
@@ -314,8 +336,19 @@ class SpannerGraphCustomRetriever(CustomPGRetriever):
         )
         self.reranker = LLMRerank(llm=llm_for_reranker, choice_batch_size=choice_batch_size, top_n=llmranker_top_n)
 
+    def generate_synthesized_response(
+        self, question: str, response: str
+    ) -> float:
+        gql_synthesized_response = self.llm.predict(
+            GQL_SYNTHESIS_RESPONSE_TEMPLATE,
+            question=question,
+            retrieved_response=response
+        )
+        return gql_synthesized_response
+
+
     def custom_retrieve(self, query_str: str) -> str:
-        """Custom retrieve function that combines vector and NL2GQL retrieval, then reranks the results.
+        """Custom retriever function that combines vector and NL2GQL retrieval, then reranks the results.
 
         Args:
             query_str: The query string.
@@ -325,14 +358,15 @@ class SpannerGraphCustomRetriever(CustomPGRetriever):
         """
 
         query_bundle = QueryBundle(query_str=query_str)
-        nodes_1 = self.vector_retriever.retrieve_from_graph(query_bundle)
+        nodes_1 = self.vector_retriever.retrieve(query_bundle)
         nodes_2 = self.nl_to_gql_retriever.retrieve_from_graph(query_bundle)
         reranked_nodes = self.reranker.postprocess_nodes(
             nodes_1 + nodes_2, query_bundle
         )
 
-        final_text = "\n\n".join(
-            [n.get_content(metadata_mode="llm") for n in reranked_nodes]
+        final_content = "\n".join(
+            [n.get_content() for n in reranked_nodes]
         )
 
-        return final_text
+        final_response = self.generate_synthesized_response(query_str, final_content)
+        return final_response 

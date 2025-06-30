@@ -255,3 +255,132 @@ DEFAULT_SUMMARY_TEMPLATE = (
     + DEFAULT_SUMMARY_TEMPLATE_PART1
 )
 
+SCORING_EXAMPLES = """
+Examples:
+
+1.
+Question: How many miles is the flight between the ANC and SEA airports?
+Response:
+It is 1440 miles to fly between the ANC and SEA airports.
+Score:
+1.0
+
+2.
+Question: Which movies have been produced by production house ABC Movies?
+Response:
+I don't know the answer
+Score:
+0.0
+
+"""
+
+DEFAULT_SCORING_TEMPLATE_PART0 = """
+You are an assistant tasked with evaluating the quality of answers.
+You will be provided with an original user query, and the response generated from retrieved information.
+
+Evaluate the response based on the following criteria:
+1.  **Groundedness:** Is the response somewhere supported by the provided context? Does it introduce any information not present in the context (hallucinations)?
+2.  **Relevance:** Does the response answer the original user query?
+3.  **Clarity:** Is the response easy to understand and well-written?
+4.  **Confidence/Uncertainty:** Does the response explicitly state that it doesn't know the answer, or show significant uncertainty?
+
+Rate the response on a scale of 0 to 1, where 0 is completely unusable (e.g., explicitly says "I don't know" or is fully irrelevant/hallucinated), and 1 is a perfect, accurate, grounded, and relevant answer.
+
+If the response explicitly states "I don't know", "I cannot answer", "information not available", or similar, it should be rated 0.0.
+
+Provide ONLY a single floating-point number as your output.
+
+{scoring_examples}
+
+"""
+
+DEFAULT_SCORING_TEMPLATE_PART1 = """
+Follow this example when generating answers.
+Question:
+{question}
+Response:
+{retrieved_context}
+Score:
+"""
+
+DEFAULT_SCORING_TEMPLATE = (
+    DEFAULT_SCORING_TEMPLATE_PART0.format(scoring_examples=SCORING_EXAMPLES)
+    + DEFAULT_SCORING_TEMPLATE_PART1
+)
+
+SYNTHESIS_EXAMPLES = """
+Examples:
+1.
+Question: Who are the alumni of the XYZ University ?
+Final_Reranked_Response:
+Person1 -> ALUMNIOF -> XYZ University
+
+Person2 -> ALUMNIOF -> XYZ University
+
+The people who are alumni of XYZ University are Person1, and Person2
+
+Synthesized_Output: 
+The names of the people who are alumni of XYZ University are: Person1, and Person2.
+
+2. 
+Question: Who are the people working in Google ?
+Final_Reranked_Response:
+Axem -> WORKED_IN -> Google
+
+Axem -> GRADUATED_FROM -> Texas University
+
+I don't know the answer.
+
+Synthesized_Output: 
+Axem, who graduated from Texas University is working in Google. 
+
+3.
+Question: Who are the people working in Google ?
+Final_Reranked_Response:
+I don't know the answer.
+
+Axem -> WORKED_IN -> Google
+
+Axem -> GRADUATED_FROM -> Texas University
+
+Synthesized_Output: 
+Axem, who graduated from Texas University is working in Google. 
+
+4.
+Question: Which movie has own the Oscar award in 1996?
+Final_Reranked_Response:
+I don't know the answer.
+
+Synthesized_Output: 
+Information is not enough to answer that question.
+"""
+
+DEFAULT_SYNTHESIS_TEMPLATE_PART0 = """
+You are an intelligent assistant. Your task is to answer the user's question.
+
+**Strictly adhere to the following rules:**
+1.  **Use ONLY the provided "Information provided" below.** Do not use any outside knowledge.
+2.  **Synthesize a concise, coherent, and accurate response.**
+3.  **Crucially: Avoid redundancy and repetition.** If the same fact or piece of information is present multiple times (even if phrased differently), state it only once in your answer.
+4.  **Prioritize facts from information entries with higher confidence scores.** If information is conflicting, resolve the conflict by prioritizing information with higher confidence scores.
+5.  **If any provided "Information" entry explicitly states "I don't know" or similar uncertainty, but other "Information" entries provide relevant details, prioritize the information that provides details.** Do NOT include phrases indicating uncertainty or "I don't know" from individual information sources if a clear answer can be formed from other available information.
+6.  **If the provided "Information provided" is NOT sufficient to fully answer the "Original Question", then you MUST state "I do not have enough information to answer that question based on the provided context."** Do not provide a partial answer or make up information.
+7.  Do not include any irrelevant or tangential details.
+
+{synthesis_examples}
+
+"""
+
+DEFAULT_SYNTHESIS_TEMPLATE_PART1 = """
+Follow this example when generating answers.
+Question:
+{question}
+Final_Reranked_Response:
+{retrieved_response}
+Synthesized_Output:
+"""
+
+DEFAULT_SYNTHESIS_TEMPLATE = (
+    DEFAULT_SYNTHESIS_TEMPLATE_PART0.format(synthesis_examples=SYNTHESIS_EXAMPLES)
+    + DEFAULT_SYNTHESIS_TEMPLATE_PART1
+)
