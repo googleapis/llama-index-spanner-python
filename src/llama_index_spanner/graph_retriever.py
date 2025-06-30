@@ -21,8 +21,7 @@ from llama_index.core.llms import LLM
 from llama_index.core.output_parsers import PydanticOutputParser
 from llama_index.core.postprocessor.llm_rerank import LLMRerank
 from llama_index.core.prompts import PromptType
-from llama_index.core.retrievers import (CustomPGRetriever,
-                                         VectorContextRetriever)
+from llama_index.core.retrievers import CustomPGRetriever, VectorContextRetriever
 from llama_index.core.schema import NodeWithScore, QueryBundle, TextNode
 from llama_index.core.vector_stores.types import VectorStore
 from pydantic import BaseModel
