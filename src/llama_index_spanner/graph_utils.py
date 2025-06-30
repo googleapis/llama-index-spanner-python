@@ -48,7 +48,7 @@ def fix_gql_syntax(query: str) -> str:
     return query
 
 
-def  extract_gql(text: str) -> str:
+def extract_gql(text: str) -> str:
     """Extract GQL query from a text.
 
     Args:

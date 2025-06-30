@@ -27,9 +27,14 @@ from llama_index.core.vector_stores.types import VectorStore
 from pydantic import BaseModel
 
 from .graph_utils import extract_gql, fix_gql_syntax
-from .prompts import (DEFAULT_GQL_FIX_TEMPLATE, DEFAULT_GQL_VERIFY_TEMPLATE,
-                      DEFAULT_SPANNER_GQL_TEMPLATE, DEFAULT_SUMMARY_TEMPLATE,
-                      DEFAULT_SCORING_TEMPLATE, DEFAULT_SYNTHESIS_TEMPLATE)
+from .prompts import (
+    DEFAULT_GQL_FIX_TEMPLATE,
+    DEFAULT_GQL_VERIFY_TEMPLATE,
+    DEFAULT_SCORING_TEMPLATE,
+    DEFAULT_SPANNER_GQL_TEMPLATE,
+    DEFAULT_SUMMARY_TEMPLATE,
+    DEFAULT_SYNTHESIS_TEMPLATE,
+)
 from .property_graph_store import SpannerPropertyGraphStore
 
 GQL_GENERATION_PROMPT = PromptTemplate(
@@ -60,13 +65,9 @@ DEFAULT_GQL_SUMMARY_TEMPLATE = PromptTemplate(
     template=DEFAULT_SUMMARY_TEMPLATE,
 )
 
-GQL_RESPONSE_SCORING_TEMPLATE = PromptTemplate(
-    template = DEFAULT_SCORING_TEMPLATE
-)
+GQL_RESPONSE_SCORING_TEMPLATE = PromptTemplate(template=DEFAULT_SCORING_TEMPLATE)
 
-GQL_SYNTHESIS_RESPONSE_TEMPLATE = PromptTemplate(
-    template = DEFAULT_SYNTHESIS_TEMPLATE
-)
+GQL_SYNTHESIS_RESPONSE_TEMPLATE = PromptTemplate(template=DEFAULT_SYNTHESIS_TEMPLATE)
 
 
 class SpannerGraphTextToGQLRetriever(BasePGRetriever):
@@ -124,7 +125,9 @@ class SpannerGraphTextToGQLRetriever(BasePGRetriever):
         self.max_gql_fix_retries = max_gql_fix_retries
         self.verify_gql = verify_gql
         self.summarize_response = summarize_response
-        self.summarization_template = summarization_template or DEFAULT_GQL_SUMMARY_TEMPLATE
+        self.summarization_template = (
+            summarization_template or DEFAULT_GQL_SUMMARY_TEMPLATE
+        )
         super().__init__(
             graph_store=graph_store, include_text=False, include_properties=False
         )
@@ -174,12 +177,9 @@ class SpannerGraphTextToGQLRetriever(BasePGRetriever):
         self, question: str, response: str
     ) -> float:
         gql_response_score = self.llm.predict(
-            GQL_RESPONSE_SCORING_TEMPLATE,
-            question=question,
-            retrieved_context=response
+            GQL_RESPONSE_SCORING_TEMPLATE, question=question, retrieved_context=response
         )
         return gql_response_score
-
 
     def retrieve_from_graph(
         self, query_bundle: schema.QueryBundle
@@ -215,7 +215,7 @@ class SpannerGraphTextToGQLRetriever(BasePGRetriever):
                 schema=schema_str,
                 format_instructions=GQL_VERIFY_PROMPT.output_parser.format_string,
             )
-    
+
             output_parser = verify_gql_output_parser.parse(verify_response)
             verified_gql = fix_gql_syntax(output_parser.verified_gql)
         else:
@@ -240,7 +240,7 @@ class SpannerGraphTextToGQLRetriever(BasePGRetriever):
             node_text = summarized_response
         else:
             node_text = str(responses)
-        
+
         score = self.calculate_score_for_predicted_response(question, node_text)
         return [
             NodeWithScore(
@@ -333,18 +333,19 @@ class SpannerGraphCustomRetriever(CustomPGRetriever):
             summarize_response=summarize_response,
             summarization_template=summarization_template,
         )
-        self.reranker = LLMRerank(llm=llm_for_reranker, choice_batch_size=choice_batch_size, top_n=llmranker_top_n)
+        self.reranker = LLMRerank(
+            llm=llm_for_reranker,
+            choice_batch_size=choice_batch_size,
+            top_n=llmranker_top_n,
+        )
 
-    def generate_synthesized_response(
-        self, question: str, response: str
-    ) -> float:
+    def generate_synthesized_response(self, question: str, response: str) -> float:
         gql_synthesized_response = self.llm.predict(
             GQL_SYNTHESIS_RESPONSE_TEMPLATE,
             question=question,
-            retrieved_response=response
+            retrieved_response=response,
         )
         return gql_synthesized_response
-
 
     def custom_retrieve(self, query_str: str) -> str:
         """Custom retriever function that combines vector and NL2GQL retrieval, then reranks the results.
@@ -363,9 +364,7 @@ class SpannerGraphCustomRetriever(CustomPGRetriever):
             nodes_1 + nodes_2, query_bundle
         )
 
-        final_content = "\n".join(
-            [n.get_content() for n in reranked_nodes]
-        )
+        final_content = "\n".join([n.get_content() for n in reranked_nodes])
 
         final_response = self.generate_synthesized_response(query_str, final_content)
-        return final_response 
+        return final_response
