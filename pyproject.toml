@@ -31,3 +31,8 @@ target-version = ['py39']
 
 [tool.isort]
 profile = "black"
+
+[tool.mypy]
+python_version = 3.9
+warn_unused_configs = true
+ignore_missing_imports = true
