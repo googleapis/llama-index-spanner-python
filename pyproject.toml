@@ -8,7 +8,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
 google-cloud-spanner = ">=3.41.0,<4.0.0"
-llama-index-core = "^0.12.0"
+llama-index-core = "^0.12.41"
 
 
 [tool.poetry.group.dev.dependencies]
