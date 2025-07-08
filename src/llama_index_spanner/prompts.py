@@ -225,7 +225,7 @@ Here is an example:
 
 Question: How many miles is the flight between the ANC and SEA airports?
 Information:
-[{"r.dist": 1440}]
+[{"flight_dist": 1440}]
 Helpful Answer:
 It is 1440 miles to fly between the ANC and SEA airports.
 """
@@ -335,16 +335,14 @@ Synthesized_Output:
 Axem, who graduated from Texas University is working in Google. 
 
 3.
-Question: Who are the people working in Google ?
+Question: I am a beginner at coding. Help me with the resources.
 Final_Reranked_Response:
-I don't know the answer.
+Coding -> LEARN_FROM -> DSA Data Book
 
-Axem -> WORKED_IN -> Google
-
-Axem -> GRADUATED_FROM -> Texas University
+Coding -> PRACTICE_ON -> Google Coders
 
 Synthesized_Output: 
-Axem, who graduated from Texas University is working in Google. 
+Since you are a beginner at Coding, You can learn coding from DSA Data Book and then practice on Google Coders platform.
 
 4.
 Question: Which movie has own the Oscar award in 1996?
@@ -352,7 +350,7 @@ Final_Reranked_Response:
 I don't know the answer.
 
 Synthesized_Output: 
-Information is not enough to answer that question.
+Information is not enough to answer the movies which has Oscar Award in 1996.
 """
 
 DEFAULT_SYNTHESIS_TEMPLATE_PART0 = """
@@ -363,9 +361,10 @@ You are an intelligent assistant. Your task is to answer the user's question.
 2.  **Synthesize a concise, coherent, and accurate response.**
 3.  **Crucially: Avoid redundancy and repetition.** If the same fact or piece of information is present multiple times (even if phrased differently), state it only once in your answer.
 4.  **Prioritize facts from information entries with higher confidence scores.** If information is conflicting, resolve the conflict by prioritizing information with higher confidence scores.
-5.  **If any provided "Information" entry explicitly states "I don't know" or similar uncertainty, but other "Information" entries provide relevant details, prioritize the information that provides details.** Do NOT include phrases indicating uncertainty or "I don't know" from individual information sources if a clear answer can be formed from other available information.
-6.  **If the provided "Information provided" is NOT sufficient to fully answer the "Original Question", then you MUST state "I do not have enough information to answer that question based on the provided context."** Do not provide a partial answer or make up information.
-7.  Do not include any irrelevant or tangential details.
+5.  **Frame your response as a direct answer to my question, incorporating the key context of my query.**
+6.  **If any provided "Information" entry explicitly states "I don't know" or similar uncertainty, but other "Information" entries provide relevant details, prioritize the information that provides details.** Do NOT include phrases indicating uncertainty or "I don't know" from individual information sources if a clear answer can be formed from other available information.
+7.  **If the provided "Information provided" is NOT sufficient to fully answer the "Original Question", then you MUST state "I do not have enough information to answer that question based on the provided context."** Do not provide a partial answer or make up information.
+8.  Do not include any irrelevant or tangential details.
 
 {synthesis_examples}
 

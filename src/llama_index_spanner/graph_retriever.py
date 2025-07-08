@@ -129,7 +129,7 @@ class SpannerGraphTextToGQLRetriever(BasePGRetriever):
             summarization_template or DEFAULT_GQL_SUMMARY_TEMPLATE
         )
         super().__init__(
-            graph_store=graph_store, include_text=False, include_properties=False
+            graph_store=graph_store, include_text=True, include_properties=False
         )
 
     def _validate_generated_gql(self, gql_query: str) -> str:
