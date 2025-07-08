@@ -55,7 +55,7 @@ def get_resources(
     graph_store = get_spanner_property_graph_store(
         graph_name_suffix, use_flexible_schema, clean_up
     )
-    storage_context = StorageContext.from_defaults(graph_store=graph_store)
+    storage_context = StorageContext.from_defaults(property_graph_store=graph_store)
     llm = GoogleGenAI(
         model="gemini-2.0-flash",
     )
