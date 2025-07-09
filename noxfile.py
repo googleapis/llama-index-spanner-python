@@ -93,7 +93,7 @@ def docfx(session):
         "sphinxcontrib-serializinghtml==1.1.5",
         "gcp-sphinx-docfx-yaml",
         "alabaster",
-        "recommonmark",
+        "myst_parser",
     )
 
     shutil.rmtree(os.path.join("docs", "_build"), ignore_errors=True)
@@ -111,7 +111,7 @@ def docfx(session):
             "sphinx.ext.napoleon,"
             "sphinx.ext.todo,"
             "sphinx.ext.viewcode,"
-            "recommonmark"
+            "myst_parser"
         ),
         "-b",
         "html",
