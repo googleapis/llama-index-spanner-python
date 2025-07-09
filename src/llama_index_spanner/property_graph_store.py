@@ -185,7 +185,7 @@ def convert_operator(operator: str) -> str:
     return mapping.get(operator, operator)
 
 
-USER_AGENT_GRAPH_STORE = "langchain-google-spanner-python:graphstore/" + __version__
+USER_AGENT_GRAPH_STORE = "llama-index-spanner-python:graphstore/" + __version__
 
 
 class SpannerPropertyGraphStore(PropertyGraphStore):

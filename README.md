@@ -84,7 +84,14 @@ retriever.retrieve("Where does Elias Thorne's sibling live?")
 
 ```
 
-Use `SpannerGraphCustomRetriever` to query your SpannerPropertyGraphStore with a hybrid approach, combining natural language to GQL translation with vector search capabilities.
+Use `SpannerGraphCustomRetriever` to query your `SpannerPropertyGraphStore` with a hybrid retrieval approach, combining natural language-to-GQL translation with vector search capabilities.
+
+The Vector Context Retriever uses semantic vector search to surface relevant contexts, even when they aren't explicitly structured in the graph. The Text2GQL Retriever translates natural language into GQL queries to extract precise relationships and attributes from the property graph.
+
+The results from both retrievers are evaluated using an LLM-based reranker, which scores them based on relevance, completeness, and contextual fit with the original query.
+
+This hybrid + rerank pipeline enables the system to handle everything from vague, open-ended questions to structured, entity-specific queries, delivering high-confidence, context-aware responses.
+
 
 ```python
 from llama_index_spanner import SpannerPropertyGraphStore, SpannerGraphCustomRetriever
@@ -110,7 +117,7 @@ retriever = SpannerGraphCustomRetriever(
 retriever.retriever("Who lives in desert?")
 ```
 
-See the full [Spanner Graph Retrievers](https://github.com/googleapis/llama-index-spanner-python/blob/main/docs/graph_retriver.ipynb) tutorial.
+See the full [Spanner Graph Retrievers](https://github.com/googleapis/llama-index-spanner-python/blob/main/docs/graph_retriever.ipynb) tutorial.
 
 ## Contributing
 
