@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# langchain-google-spanner documentation build configuration file
+# llama-index-spanner documentation build configuration file
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -56,7 +56,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
-    "recommonmark",
+    "myst_parser",
 ]
 
 # autodoc/autosummary flags

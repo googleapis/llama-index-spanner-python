@@ -15,12 +15,14 @@
 import os
 import random
 
+from google.cloud import spanner
 from llama_index.core.storage import StorageContext
 from llama_index.embeddings.google_genai import GoogleGenAIEmbedding
 from llama_index.llms.google_genai import GoogleGenAI
 
 from llama_index_spanner import SpannerPropertyGraphStore
 
+project_id = os.environ.get("PROJECT_ID")
 spanner_instance_id = os.environ.get("SPANNER_INSTANCE_ID") or "graphdb-spanner-llama"
 spanner_database_id = (
     os.environ.get("SPANNER_DATABASE_ID") or "llama-index-integration-tests"
@@ -43,10 +45,11 @@ def get_spanner_property_graph_store(
         graph_name=graph_name,
         clean_up=clean_up,
         use_flexible_schema=use_flexible_schema,
+        client=spanner.Client(project=project_id)
     )
 
 
-def get_resources(
+def -get_resources(
     graph_name_suffix: str = "",
     use_flexible_schema: bool = False,
     clean_up: bool = False,

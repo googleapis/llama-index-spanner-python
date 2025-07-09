@@ -26,18 +26,18 @@ steps:
   - id: Run integration tests
     name: 'python:${_VERSION}'
     entrypoint: python
-    args: ["-m", "pytest", "--cov=langchain_google_spanner", "--cov-config=.coveragerc", "tests/"]
+    args: ["-m", "pytest", "--cov=llama_index_spanner", "--cov-config=.coveragerc", "tests/"]
     env:
       - "PROJECT_ID=$PROJECT_ID"
-      - "INSTANCE_ID=${_INSTANCE_ID}"
-      - "GOOGLE_DATABASE=${_GOOGLE_DATABASE}"
-      - "PG_DATABASE=${_PG_DATABASE}"
+      - "SPANNER_INSTANCE_ID=${_SPANNER_INSTANCE_ID}"
+      - "SPANNER_DATABASE_ID=${_SPANNER_DATABASE_ID}"
+      - "SPANNER_GRAPH_NAME=${_SPANNER_GRAPH_NAME}"
 
 timeout: "7200s"  
 substitutions:
-  _INSTANCE_ID: test-instance
-  _GOOGLE_DATABASE: test-google-db
-  _PG_DATABASE: test-pg-db
+  _SPANNER_INSTANCE_ID: test-instance
+  _SPANNER_DATABASE_ID: test-google-db
+  _SPANNER_GRAPH_NAME: test-pg-llama-index-graph-db
   _VERSION: "3.9"
 
 options:
