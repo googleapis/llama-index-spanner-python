@@ -323,6 +323,17 @@ Synthesized_Output:
 The names of the people who are alumni of XYZ University are: Person1, and Person2.
 
 2. 
+Question: Who are the alumni of the XYZ University ?
+Final_Reranked_Response:
+
+Eric -> ALUMNIOF -> XYZ University
+
+[{'alumni_name': 'Eric'}, {'alumni_name': 'Amar'}]
+
+Synthesized_Output: 
+The names of the people who are alumni of XYZ University are: Eric, and Amar.
+
+3. 
 Question: Who are the people working in Google ?
 Final_Reranked_Response:
 Axem -> WORKED_IN -> Google
@@ -334,7 +345,7 @@ I don't know the answer.
 Synthesized_Output: 
 Axem, who graduated from Texas University is working in Google. 
 
-3.
+4.
 Question: I am a beginner at coding. Help me with the resources.
 Final_Reranked_Response:
 Coding -> LEARN_FROM -> DSA Data Book
@@ -344,8 +355,17 @@ Coding -> PRACTICE_ON -> Google Coders
 Synthesized_Output: 
 Since you are a beginner at Coding, You can learn coding from DSA Data Book and then practice on Google Coders platform.
 
-4.
-Question: Which movie has own the Oscar award in 1996?
+5. 
+Question: Find products that were reviewed by customers who bought an electronic item ?
+Final_Reranked_Response:
+
+[{'reviewed_product': 'Chromebook'}, {'reviewed_product': 'Google Pixel 9'}]
+
+Synthesized_Output: 
+Chromebook and Google Pixel 9 were some of the products that were reviewed by customers who bought an electronic item.
+
+6.
+Question: Which movie has won the Oscar award in 1996?
 Final_Reranked_Response:
 I don't know the answer.
 
