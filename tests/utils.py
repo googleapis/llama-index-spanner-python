@@ -45,11 +45,11 @@ def get_spanner_property_graph_store(
         graph_name=graph_name,
         clean_up=clean_up,
         use_flexible_schema=use_flexible_schema,
-        client=spanner.Client(project=project_id)
+        client=spanner.Client(project=project_id),
     )
 
 
-def -get_resources(
+def get_resources(
     graph_name_suffix: str = "",
     use_flexible_schema: bool = False,
     clean_up: bool = False,

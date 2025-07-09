@@ -58,7 +58,7 @@ def docs(session):
         "sphinxcontrib-serializinghtml==1.1.5",
         "sphinx==4.5.0",
         "alabaster",
-        "recommonmark",
+        "myst_parser",
     )
 
     shutil.rmtree(os.path.join("docs", "_build"), ignore_errors=True)
