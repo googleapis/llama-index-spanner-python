@@ -20,8 +20,8 @@ steps:
 
   - id: Install test requirements
     name: 'python:${_VERSION}'
-    entrypoint: poetry
-    args: ["install", "--with", "test", "--no-interaction", "--no-ansi"]
+    entrypoint: pip
+    args: ["install", ".[test]", "--user"]
 
   - id: Run integration tests
     name: 'python:${_VERSION}'
