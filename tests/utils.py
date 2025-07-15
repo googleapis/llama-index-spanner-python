@@ -60,7 +60,7 @@ def get_resources(
     )
     storage_context = StorageContext.from_defaults(property_graph_store=graph_store)
     llm = GoogleGenAI(
-        model="gemini-2.0-flash",
+        model="gemini-1.5-flash-latest",
     )
     embed_model = GoogleGenAIEmbedding(
         model_name="text-embedding-004", embed_batch_size=100
