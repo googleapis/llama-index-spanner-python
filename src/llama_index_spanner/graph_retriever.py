@@ -314,7 +314,7 @@ class SpannerGraphCustomRetriever(CustomPGRetriever):
         self.llm = llm_text_to_gql or Settings.llm
         if self.llm is None:
             raise ValueError("`llm for Text to GQL` cannot be none")
-        
+
         self.vector_retriever = VectorContextRetriever(
             graph_store=self._graph_store,
             include_text=self.include_text,
