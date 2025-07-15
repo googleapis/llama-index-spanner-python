@@ -22,10 +22,10 @@ from llama_index.llms.google_genai import GoogleGenAI
 
 from llama_index_spanner import SpannerPropertyGraphStore
 
-project_id = os.environ.get("PROJECT_ID")
-spanner_instance_id = os.environ.get("SPANNER_INSTANCE_ID") or "graphdb-spanner-llama"
+project_id = os.environ.get("PROJECT_ID") or "llamaindex-spanner-testing"
+spanner_instance_id = os.environ.get("SPANNER_INSTANCE_ID") or "test-llamaindex-instance"
 spanner_database_id = (
-    os.environ.get("SPANNER_DATABASE_ID") or "llama-index-integration-tests"
+    os.environ.get("SPANNER_DATABASE_ID") or "test-google-db"
 )
 spanner_graph_name = os.environ.get("SPANNER_GRAPH_NAME") or "llama_index_graph"
 

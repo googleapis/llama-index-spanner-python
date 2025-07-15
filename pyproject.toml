@@ -16,7 +16,10 @@ pytest-asyncio = { version = "^0.24.0", optional = true }
 black = { version = "^25.1.0", optional = true, extras = ["jupyter"] }
 isort = { version = "^6.0.1", optional = true }
 mypy = { version = "^1.16.0", optional = true }
-
+llama-index-readers-wikipedia = { version = "^0.3.0", optional = true }
+llama-index-embeddings-google-genai = { version = "^0.1.0", optional = true }
+llama-index-llms-google-genai = { version = "^0.1.4", optional = true }
+wikipedia = { version = "^1.4.0", optional = true }
 
 [tool.poetry.group.dev.dependencies]
 llama-index = "^0.12.22"
@@ -35,19 +38,22 @@ pytest = "8.3.3"
 pytest-xdist = "^3.6.1"
 pytest-cov= "^5.0.0"
 pytest-asyncio= "^0.24.0"
-black = {extras = ["jupyter"], version = "^25.1.0"}
-isort = "^6.0.1"
-mypy = "^1.16.0"
+wikipedia="^1.4.0"
 
 [tool.poetry.extras]
 test = [
   "pytest", 
   "pytest-xdist", 
   "pytest-cov",
+  "pytest-asyncio",
+  "llama-index-readers-wikipedia",
+  "llama-index-embeddings-google-genai",
+  "llama-index-llms-google-genai",
+  "ipykernel",
   "black",
   "isort",
   "mypy",
-  "pytest-asyncio"
+  "wikipedia"
 ]
 
 [build-system]

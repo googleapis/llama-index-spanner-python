@@ -75,7 +75,7 @@ def load(schema_type):
 def test_graph_retriever():
     """Test the graph retriever."""
     for schema_type in ["static", "flexible"]:
-        # setup(schema_type)
+        setup(schema_type)
         retriever = load(schema_type)
 
         query_engine = RetrieverQueryEngine(retriever=retriever)
@@ -89,7 +89,7 @@ def test_graph_retriever():
 
 def setup2(schema_type):
     graph_store, _, llm, embed_model = get_resources(
-        schema_type + "_2",
+        schema_type + "_3",
         clean_up=True,
         use_flexible_schema=schema_type == "flexible",
     )
@@ -161,22 +161,22 @@ def setup2(schema_type):
     graph_store.upsert_nodes(nodes)
     graph_store.upsert_relations(relations)
 
-    retriver = SpannerGraphCustomRetriever(
+    retriever = SpannerGraphCustomRetriever(
         graph_store=graph_store,
         embed_model=embed_model,
-        llm=llm,
+        llm_text_to_gql=llm,
         include_raw_response_as_metadata=True,
         verbose=True,
     )
 
-    retriver2 = SpannerGraphTextToGQLRetriever(
+    retriever2 = SpannerGraphTextToGQLRetriever(
         graph_store=graph_store,
         llm=llm,
         include_raw_response_as_metadata=True,
         verbose=True,
     )
 
-    return retriver, retriver2, graph_store
+    return retriever, retriever2, graph_store
 
 
 @pytest.fixture
