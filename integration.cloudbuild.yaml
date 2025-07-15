@@ -32,8 +32,9 @@ steps:
       - "SPANNER_INSTANCE_ID=${_SPANNER_INSTANCE_ID}"
       - "SPANNER_DATABASE_ID=${_SPANNER_DATABASE_ID}"
       - "SPANNER_GRAPH_NAME=${_SPANNER_GRAPH_NAME}"
+      - "GOOGLE_API_KEY=$GOOGLE_API_KEY"
 
-timeout: "7200s"  
+timeout: "9000s"  
 substitutions:
   _SPANNER_INSTANCE_ID: test-llamaindex-instance
   _SPANNER_DATABASE_ID: test-google-db
