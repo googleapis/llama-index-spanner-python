@@ -28,7 +28,7 @@ spanner_instance_id = (
 )
 spanner_database_id = os.environ.get("SPANNER_DATABASE_ID") or "test-google-db"
 spanner_graph_name = os.environ.get("SPANNER_GRAPH_NAME") or "llama_index_graph"
-google_api_key = os.environ.get("GOOGLE_API_KEY") or None
+google_api_key = os.environ.get("GOOGLE_API_KEY") or ''
 
 
 def get_spanner_property_graph_store(
@@ -61,7 +61,7 @@ def get_resources(
     )
     storage_context = StorageContext.from_defaults(property_graph_store=graph_store)
     llm = GoogleGenAI(
-        model="gemini-1.5-flash-latest", api_key=google_api_key,
+        model="gemini-2.0-flash", api_key=google_api_key,
     )
     embed_model = GoogleGenAIEmbedding(
         model_name="text-embedding-004", embed_batch_size=100
