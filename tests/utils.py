@@ -34,7 +34,7 @@ google_api_key = os.environ.get("GOOGLE_API_KEY")
 def get_spanner_property_graph_store(
     graph_name_suffix: str = "",
     use_flexible_schema: bool = False,
-    clean_up: bool = False,
+    clean_up: bool = True,
 ) -> SpannerPropertyGraphStore:
     """Get a SpannerPropertyGraphStore instance for testing."""
     graph_name = spanner_graph_name

@@ -23,13 +23,13 @@ from llama_index_spanner.graph_retriever import (
     SpannerGraphCustomRetriever,
     SpannerGraphTextToGQLRetriever,
 )
-from tests.utils import get_resources
+from tests.utils import get_resources, get_random_suffix
 
 
 def setup(schema_type):
     """Setup the index for integration tests."""
     graph_store, _, llm, embed_model = get_resources(
-        schema_type, clean_up=True, use_flexible_schema=schema_type == "flexible"
+        schema_type + "_" + get_random_suffix(), clean_up=True, use_flexible_schema=schema_type == "flexible"
     )
 
     loader = WikipediaReader()
@@ -89,7 +89,7 @@ def test_graph_retriever():
 
 def setup2(schema_type):
     graph_store, _, llm, embed_model = get_resources(
-        schema_type + "_3",
+        schema_type + "_2",
         clean_up=True,
         use_flexible_schema=schema_type == "flexible",
     )
