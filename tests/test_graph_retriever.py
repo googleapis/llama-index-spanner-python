@@ -29,7 +29,9 @@ from tests.utils import get_resources, get_random_suffix
 def setup(schema_type):
     """Setup the index for integration tests."""
     graph_store, _, llm, embed_model = get_resources(
-        schema_type + "_" + get_random_suffix(), clean_up=True, use_flexible_schema=schema_type == "flexible"
+        schema_type + "_" + get_random_suffix(),
+        clean_up=True,
+        use_flexible_schema=schema_type == "flexible",
     )
 
     loader = WikipediaReader()
