@@ -39,7 +39,7 @@ availableSecrets:
   - versionName: projects/671470374905/secrets/google-api-key/versions/latest
     env: "GOOGLE_API_KEY" 
 
-timeout: "9000s"  
+timeout: "14400s"  
 substitutions:
   _SPANNER_INSTANCE_ID: test-llamaindex-instance
   _SPANNER_DATABASE_ID: test-google-db
