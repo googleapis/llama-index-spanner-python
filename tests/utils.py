@@ -53,7 +53,7 @@ def get_spanner_property_graph_store(
 def get_resources(
     graph_name_suffix: str = "",
     use_flexible_schema: bool = False,
-    clean_up: bool = False,
+    clean_up: bool = True,
 ):
     """Get the resources for testing."""
     graph_store = get_spanner_property_graph_store(

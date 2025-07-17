@@ -43,7 +43,7 @@ timeout: "9000s"
 substitutions:
   _SPANNER_INSTANCE_ID: test-llamaindex-instance
   _SPANNER_DATABASE_ID: test-google-db
-  _SPANNER_GRAPH_NAME: test_pg_llama_index_graph_db
+  _SPANNER_GRAPH_NAME: test_llama_graph_db
   _VERSION: "3.9"
 
 options:
