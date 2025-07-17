@@ -28,7 +28,7 @@ spanner_instance_id = (
 )
 spanner_database_id = os.environ.get("SPANNER_DATABASE_ID") or "test-google-db"
 spanner_graph_name = os.environ.get("SPANNER_GRAPH_NAME") or "llama_index_graph"
-google_api_key = os.environ.get("GOOGLE_API_KEY") or ""
+google_api_key = os.environ.get("GOOGLE_API_KEY")
 
 
 def get_spanner_property_graph_store(

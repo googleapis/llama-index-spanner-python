@@ -27,12 +27,17 @@ steps:
     name: 'python:${_VERSION}'
     entrypoint: python
     args: ["-m", "pytest", "--cov=llama_index_spanner", "--cov-config=.coveragerc", "tests/"]
+    secretEnv: ["GOOGLE_API_KEY"]
     env:
       - "PROJECT_ID=$PROJECT_ID"
       - "SPANNER_INSTANCE_ID=${_SPANNER_INSTANCE_ID}"
       - "SPANNER_DATABASE_ID=${_SPANNER_DATABASE_ID}"
       - "SPANNER_GRAPH_NAME=${_SPANNER_GRAPH_NAME}"
-      - "GOOGLE_API_KEY=${_API_KEY}"
+
+availableSecrets:
+  secretManager:
+  - versionName: projects/671470374905/secrets/google-api-key/versions/latest
+    env: "GOOGLE_API_KEY" 
 
 timeout: "9000s"  
 substitutions:
@@ -40,7 +45,6 @@ substitutions:
   _SPANNER_DATABASE_ID: test-google-db
   _SPANNER_GRAPH_NAME: test_pg_llama_index_graph_db
   _VERSION: "3.9"
-  _API_KEY: ''
 
 options:
   dynamicSubstitutions: true
