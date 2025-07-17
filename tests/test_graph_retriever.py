@@ -87,6 +87,7 @@ def test_graph_retriever():
         print(response)
         response = query_engine.query("Some Products of Google?")
         print(response)
+        retriever._graph_store.clean_up()
 
 
 def setup2(schema_type):
