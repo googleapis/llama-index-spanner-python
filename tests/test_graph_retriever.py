@@ -23,7 +23,7 @@ from llama_index_spanner.graph_retriever import (
     SpannerGraphCustomRetriever,
     SpannerGraphTextToGQLRetriever,
 )
-from tests.utils import get_resources, get_random_suffix
+from tests.utils import get_random_suffix, get_resources
 
 
 def setup(schema_type):
