@@ -52,13 +52,11 @@ def setup(schema_type):
         show_progress=True,
         property_graph_store=graph_store,
     )
+    return graph_store, llm, embed_model
 
 
-def load(schema_type):
+def load(graph_store, llm, embed_model):
     """Load the retriever for integration tests."""
-    graph_store, _, llm, embed_model = get_resources(
-        schema_type, clean_up=False, use_flexible_schema=schema_type == "flexible"
-    )
     Settings.llm = llm
 
     index = PropertyGraphIndex.from_existing(
@@ -77,8 +75,8 @@ def load(schema_type):
 def test_graph_retriever():
     """Test the graph retriever."""
     for schema_type in ["static", "flexible"]:
-        setup(schema_type)
-        retriever = load(schema_type)
+        graph_store, llm, embed_model = setup(schema_type)
+        retriever = load(graph_store, llm, embed_model)
 
         query_engine = RetrieverQueryEngine(retriever=retriever)
         response = query_engine.query("what is parent company of Google?")
@@ -87,7 +85,7 @@ def test_graph_retriever():
         print(response)
         response = query_engine.query("Some Products of Google?")
         print(response)
-        retriever._graph_store.clean_up()
+        graph_store.clean_up()
 
 
 def setup2(schema_type):
