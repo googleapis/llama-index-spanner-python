@@ -26,7 +26,7 @@ steps:
   - id: Run integration tests
     name: 'python:${_VERSION}'
     entrypoint: python
-    args: ["-m", "pytest", "-n", "4", "--cov=llama_index_spanner", "--cov-config=.coveragerc", "tests/"]
+    args: ["-m", "pytest", "-n", "6", "--cov=llama_index_spanner", "--cov-config=.coveragerc", "tests/"]
     secretEnv: ["GOOGLE_API_KEY"]
     env:
       - "PROJECT_ID=$PROJECT_ID"
