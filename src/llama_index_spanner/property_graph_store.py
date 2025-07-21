@@ -57,7 +57,7 @@ def node_from_json(label: str, json_node_properties: Dict[str, Any]) -> Labelled
     Returns:
       A LabelledNode.
     """
-    id_, name, text, properties, embedding = "", "", "", {}, None
+    id_, name, text, properties, embedding = "", "", None, {}, None
     for k, v in json_node_properties.items():
         if k == ElementSchema.NODE_KEY_COLUMN_NAME:
             id_ = v

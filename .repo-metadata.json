@@ -1,6 +1,6 @@
 {
     "name": "llama-index-spanner",
-    "name_pretty": "Spanner for LlamaIndex - Python",
+    "name_pretty": "Cloud Spanner for LlamaIndex - Python",
     "issue_tracker": "https://github.com/googleapis/llama-index-spanner-python/issues",
     "client_documentation": "https://github.com/googleapis/llama-index-spanner-python/tree/main/docs",
     "release_level": "preview",

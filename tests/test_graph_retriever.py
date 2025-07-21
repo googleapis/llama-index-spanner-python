@@ -23,13 +23,15 @@ from llama_index_spanner.graph_retriever import (
     SpannerGraphCustomRetriever,
     SpannerGraphTextToGQLRetriever,
 )
-from tests.utils import get_resources
+from tests.utils import get_random_suffix, get_resources
 
 
 def setup(schema_type):
     """Setup the index for integration tests."""
     graph_store, _, llm, embed_model = get_resources(
-        schema_type, clean_up=True, use_flexible_schema=schema_type == "flexible"
+        schema_type + "_" + get_random_suffix(),
+        clean_up=True,
+        use_flexible_schema=schema_type == "flexible",
     )
 
     loader = WikipediaReader()
@@ -50,13 +52,11 @@ def setup(schema_type):
         show_progress=True,
         property_graph_store=graph_store,
     )
+    return graph_store, llm, embed_model
 
 
-def load(schema_type):
+def load(graph_store, llm, embed_model):
     """Load the retriever for integration tests."""
-    graph_store, _, llm, embed_model = get_resources(
-        schema_type, clean_up=False, use_flexible_schema=schema_type == "flexible"
-    )
     Settings.llm = llm
 
     index = PropertyGraphIndex.from_existing(
@@ -75,8 +75,8 @@ def load(schema_type):
 def test_graph_retriever():
     """Test the graph retriever."""
     for schema_type in ["static", "flexible"]:
-        # setup(schema_type)
-        retriever = load(schema_type)
+        graph_store, llm, embed_model = setup(schema_type)
+        retriever = load(graph_store, llm, embed_model)
 
         query_engine = RetrieverQueryEngine(retriever=retriever)
         response = query_engine.query("what is parent company of Google?")
@@ -85,11 +85,12 @@ def test_graph_retriever():
         print(response)
         response = query_engine.query("Some Products of Google?")
         print(response)
+        graph_store.clean_up()
 
 
 def setup2(schema_type):
     graph_store, _, llm, embed_model = get_resources(
-        schema_type + "_2",
+        schema_type + "_" + get_random_suffix(),
         clean_up=True,
         use_flexible_schema=schema_type == "flexible",
     )
@@ -161,22 +162,22 @@ def setup2(schema_type):
     graph_store.upsert_nodes(nodes)
     graph_store.upsert_relations(relations)
 
-    retriver = SpannerGraphCustomRetriever(
+    retriever = SpannerGraphCustomRetriever(
         graph_store=graph_store,
         embed_model=embed_model,
-        llm=llm,
+        llm_text_to_gql=llm,
         include_raw_response_as_metadata=True,
         verbose=True,
     )
 
-    retriver2 = SpannerGraphTextToGQLRetriever(
+    retriever2 = SpannerGraphTextToGQLRetriever(
         graph_store=graph_store,
         llm=llm,
         include_raw_response_as_metadata=True,
         verbose=True,
     )
 
-    return retriver, retriver2, graph_store
+    return retriever, retriever2, graph_store
 
 
 @pytest.fixture

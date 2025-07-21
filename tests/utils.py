@@ -15,23 +15,26 @@
 import os
 import random
 
+from google.cloud import spanner
 from llama_index.core.storage import StorageContext
 from llama_index.embeddings.google_genai import GoogleGenAIEmbedding
 from llama_index.llms.google_genai import GoogleGenAI
 
 from llama_index_spanner import SpannerPropertyGraphStore
 
-spanner_instance_id = os.environ.get("SPANNER_INSTANCE_ID") or "graphdb-spanner-llama"
-spanner_database_id = (
-    os.environ.get("SPANNER_DATABASE_ID") or "llama-index-integration-tests"
+project_id = os.environ.get("PROJECT_ID") or "llamaindex-spanner-testing"
+spanner_instance_id = (
+    os.environ.get("SPANNER_INSTANCE_ID") or "test-llamaindex-instance"
 )
+spanner_database_id = os.environ.get("SPANNER_DATABASE_ID") or "test-google-db"
 spanner_graph_name = os.environ.get("SPANNER_GRAPH_NAME") or "llama_index_graph"
+google_api_key = os.environ.get("GOOGLE_API_KEY")
 
 
 def get_spanner_property_graph_store(
     graph_name_suffix: str = "",
     use_flexible_schema: bool = False,
-    clean_up: bool = False,
+    clean_up: bool = True,
 ) -> SpannerPropertyGraphStore:
     """Get a SpannerPropertyGraphStore instance for testing."""
     graph_name = spanner_graph_name
@@ -43,13 +46,14 @@ def get_spanner_property_graph_store(
         graph_name=graph_name,
         clean_up=clean_up,
         use_flexible_schema=use_flexible_schema,
+        client=spanner.Client(project=project_id),
     )
 
 
 def get_resources(
     graph_name_suffix: str = "",
     use_flexible_schema: bool = False,
-    clean_up: bool = False,
+    clean_up: bool = True,
 ):
     """Get the resources for testing."""
     graph_store = get_spanner_property_graph_store(
@@ -58,6 +62,7 @@ def get_resources(
     storage_context = StorageContext.from_defaults(property_graph_store=graph_store)
     llm = GoogleGenAI(
         model="gemini-2.0-flash",
+        api_key=google_api_key,
     )
     embed_model = GoogleGenAIEmbedding(
         model_name="text-embedding-004", embed_batch_size=100
