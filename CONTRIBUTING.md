@@ -1,6 +1,7 @@
 # How to Contribute
 
-We would love to accept your patches and contributions to this project.
+We'd love to accept your patches and contributions to this project. There are
+just a few small guidelines you need to follow.
 
 ## Before you begin
 

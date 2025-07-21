@@ -12,8 +12,18 @@ authors = [
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
 google-cloud-spanner = ">=3.41.0,<4.0.0"
-llama-index-core = "^0.12.0"
-
+llama-index-core = "^0.12.41"
+pytest = { version = "8.3.3", optional = true }
+pytest-xdist = { version = "^3.6.1", optional = true }
+pytest-cov = { version = "^5.0.0", optional = true }
+pytest-asyncio = { version = "^0.24.0", optional = true }
+black = { version = "^25.1.0", optional = true, extras = ["jupyter"] }
+isort = { version = "^6.0.1", optional = true }
+mypy = { version = "^1.16.0", optional = true }
+llama-index-readers-wikipedia = { version = "^0.3.0", optional = true }
+llama-index-embeddings-google-genai = { version = "^0.1.0", optional = true }
+llama-index-llms-google-genai = { version = "^0.1.4", optional = true }
+wikipedia = { version = "^1.4.0", optional = true }
 classifiers = [
     "Intended Audience :: Developers",
     "License :: OSI Approved :: Apache Software License",
@@ -27,15 +37,39 @@ classifiers = [
 
 
 [tool.poetry.group.dev.dependencies]
-pytest = "8.3.3"
 llama-index = "^0.12.22"
 pyvis = "^0.3.2"
-pytest-xdist = "^3.6.1"
 llama-index-llms-google-genai = "^0.1.4"
 llama-index-readers-wikipedia = "^0.3.0"
 wikipedia = "^1.4.0"
 llama-index-embeddings-google-genai = "^0.1.0"
 ipykernel = "^6.29.5"
+black = {extras = ["jupyter"], version = "^25.1.0"}
+isort = "^6.0.1"
+mypy = "^1.16.0"
+
+[tool.poetry.group.test.dependencies]
+pytest = "8.3.3"
+pytest-xdist = "^3.6.1"
+pytest-cov= "^5.0.0"
+pytest-asyncio= "^0.24.0"
+wikipedia="^1.4.0"
+
+[tool.poetry.extras]
+test = [
+  "pytest", 
+  "pytest-xdist", 
+  "pytest-cov",
+  "pytest-asyncio",
+  "llama-index-readers-wikipedia",
+  "llama-index-embeddings-google-genai",
+  "llama-index-llms-google-genai",
+  "ipykernel",
+  "black",
+  "isort",
+  "mypy",
+  "wikipedia"
+]
 
 [project.urls]
 Homepage = "https://github.com/googleapis/llama-index-spanner-python"
@@ -62,6 +96,12 @@ target-version = ['py39']
 
 [tool.isort]
 profile = "black"
+
+[tool.mypy]
+python_version = 3.9
+warn_unused_configs = true
+ignore_missing_imports = true
+
 
 [tool.mypy]
 python_version = 3.9

@@ -14,17 +14,19 @@ and creating release PRs.
 
 Learn more by reading [How should I write my commits?](https://github.com/googleapis/release-please?tab=readme-ov-file#how-should-i-write-my-commits)
 
-<!-- ## Testing
+## Testing
 
 ### Run tests locally
 
-1. Set environment variables for `SPANNER_INSTANCE_ID`, `SPANNER_DATABASE_ID`, `SPANNER_GRAPH_NAME`
+1. Set environment variables for `SPANNER_INSTANCE_ID`, `SPANNER_DATABASE_ID`, `SPANNER_GRAPH_NAME`, `GEMINI_API_KEY` or `GOOGLE_API_KEY`
 
-1. Run pytest to automatically run all tests:
+2. Run pytest to automatically run all tests:
 
     ```bash
     pytest
     ```
+
+    Note: Use the `-n 7` flag to set 7 workers for parallel testing. Ensure the database has no existing graphs, as there is a limit on the number of graphs allowed.
 
 ### CI Platform Setup
 
@@ -90,4 +92,4 @@ Here is a breakdown of the report:
 - `Missing`: lines that are not covered by tests.
 
 
-[triggers]: https://console.cloud.google.com/cloud-build/triggers?e=13802955&project=langchain-spanner-testing -->
+[triggers]: https://console.cloud.google.com/cloud-build/triggers?e=13802955&project=langchain-spanner-testing

@@ -1,4 +1,4 @@
-# Copyright 2024 Google LLC
+# Copyright 2025 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,7 +26,14 @@ branchProtectionRules:
 - pattern: main
   isAdminEnforced: true
   requiredStatusCheckContexts:
-    - 'cla/google'
+    - "cla/google"
+    - "lint"
+    - "integration-test-pr-py39 (llamaindex-spanner-testing)"
+    - "integration-test-pr-py310 (llamaindex-spanner-testing)"
+    - "integration-test-pr-py311 (llamaindex-spanner-testing)"
+    - "integration-test-pr-py312 (llamaindex-spanner-testing)"
+    - "conventionalcommits.org"
+    - "header-check"
   # - Add required status checks like presubmit tests
   requiredApprovingReviewCount: 1
   requiresCodeOwnerReviews: true
@@ -34,7 +41,5 @@ branchProtectionRules:
 
 # Set team access
 permissionRules:
-  - team: senseai-eco
-    permission: admin
   - team: llama-index-spanner 
-    permission: push
+    permission: admin
