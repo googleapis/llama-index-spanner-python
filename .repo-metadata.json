@@ -9,5 +9,5 @@
     "repo": "googleapis/llama-index-spanner-python",
     "distribution_name": "llama-index-spanner",
     "requires_billing": true,
-    "codeowner_team": "@googleapis/senseai-eco"
+    "codeowner_team": "@googleapis/llama-index-spanner"
 }

@@ -41,5 +41,5 @@ branchProtectionRules:
 
 # Set team access
 permissionRules:
-  - team: llama-index-spanner 
+  - team: llama-index-spanner
     permission: admin
