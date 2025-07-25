@@ -314,8 +314,8 @@ class SpannerGraphCustomRetriever(CustomPGRetriever):
         if not isinstance(self._graph_store, SpannerPropertyGraphStore):
             raise TypeError(
                 "SpannerGraphCustomRetriever requires a SpannerPropertyGraphStore."
-        )
-    
+            )
+
         self.llm = llm_text_to_gql or Settings.llm
         if self.llm is None:
             raise ValueError("`llm for Text to GQL` cannot be none")
