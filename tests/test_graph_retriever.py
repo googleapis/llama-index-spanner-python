@@ -200,8 +200,8 @@ def test_graph_retriever2_static(retrievers_static):
         res = retriever.retrieve("Where does Elias Thorne's sibling live?")
         assert "Capital City" in str(res)
 
-        # res = retriever.retrieve("Who lives in desert?")
-        # assert "Elias Thorne" in str(res)
+        res = retriever.retrieve("Who lives in desert?")
+        assert "Elias Thorne" in str(res)
 
 
 def test_graph_retriever2_dynamic(retrievers_dynamic):
