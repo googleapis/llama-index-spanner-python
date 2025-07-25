@@ -10,7 +10,8 @@ authors = [
 ]
 dependencies = [
     "google-cloud-spanner>=3.41.0, <4.0.0",
-    "llama-index-core==0.12.48"
+    "llama-index-core>=0.12.48, <1.0.0",
+    "llama-index>=0.12.41, <1.0.0"
 ]
 classifiers = [
     "Intended Audience :: Developers",
@@ -47,6 +48,7 @@ test = [
     "pytest==8.3.3",
     "pytest-xdist==3.6.1",
     "pytest-cov==5.0.0",
+    "pytest-asyncio==0.24.0",
     "llama-index-readers-wikipedia==0.3.0",
     "llama-index-embeddings-google-genai==0.1.0",
     "llama-index-llms-google-genai==0.1.4",
