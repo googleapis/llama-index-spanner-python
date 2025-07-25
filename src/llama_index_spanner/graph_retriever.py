@@ -23,7 +23,7 @@ from llama_index.core.postprocessor.llm_rerank import LLMRerank
 from llama_index.core.prompts import PromptType
 from llama_index.core.retrievers import CustomPGRetriever, VectorContextRetriever
 from llama_index.core.schema import NodeWithScore, QueryBundle, TextNode
-from llama_index.core.vector_stores.types import VectorStore
+from llama_index.core.vector_stores.types import BasePydanticVectorStore
 from pydantic import BaseModel
 
 from .graph_utils import extract_gql, fix_gql_syntax
@@ -78,7 +78,6 @@ class SpannerGraphTextToGQLRetriever(BasePGRetriever):
         graph_store: SpannerPropertyGraphStore,
         llm: Optional[LLM] = None,
         text_to_gql_prompt: Optional[PromptTemplate] = None,
-        response_template: Optional[str] = None,
         gql_validator: Optional[Callable[[str], bool]] = None,
         include_raw_response_as_metadata: Optional[bool] = False,
         max_gql_fix_retries: Optional[int] = 1,
@@ -93,7 +92,6 @@ class SpannerGraphTextToGQLRetriever(BasePGRetriever):
           graph_store: The SpannerPropertyGraphStore to query.
           llm: The LLM to use.
           text_to_gql_prompt: The prompt to use for generating the GQL query.
-          response_template: The template to use for formatting the response.
           gql_validator: A function to validate the GQL query.
           include_raw_response_as_metadata: If true, includes the raw response as
             metadata.
@@ -179,7 +177,7 @@ class SpannerGraphTextToGQLRetriever(BasePGRetriever):
         gql_response_score = self.llm.predict(
             GQL_RESPONSE_SCORING_TEMPLATE, question=question, retrieved_context=response
         )
-        return gql_response_score
+        return float(gql_response_score.strip())
 
     def retrieve_from_graph(
         self, query_bundle: schema.QueryBundle
@@ -208,16 +206,19 @@ class SpannerGraphTextToGQLRetriever(BasePGRetriever):
 
         # 2. Verify gql query using LLM
         if self.verify_gql:
-            verify_response = self.llm.predict(
-                GQL_VERIFY_PROMPT,
-                question=question,
-                generated_gql=generated_gql,
-                schema=schema_str,
-                format_instructions=GQL_VERIFY_PROMPT.output_parser.format_string,
-            )
+            if GQL_VERIFY_PROMPT.output_parser:
+                verify_response = self.llm.predict(
+                    GQL_VERIFY_PROMPT,
+                    question=question,
+                    generated_gql=generated_gql,
+                    schema=schema_str,
+                    format_instructions=GQL_VERIFY_PROMPT.output_parser.format,
+                )
 
-            output_parser = verify_gql_output_parser.parse(verify_response)
-            verified_gql = fix_gql_syntax(output_parser.verified_gql)
+                output_parser = verify_gql_output_parser.parse(verify_response)
+                verified_gql = fix_gql_syntax(output_parser.verified_gql)
+            else:
+                raise ValueError("GQL_VERIFY_PROMPT is missing its output_parser.")
         else:
             verified_gql = generated_gql
 
@@ -259,7 +260,7 @@ class SpannerGraphTextToGQLRetriever(BasePGRetriever):
     async def aretrieve_from_graph(
         self, query_bundle: QueryBundle
     ) -> List[NodeWithScore]:
-        return await self.retrieve_from_graph(query_bundle)
+        return self.retrieve_from_graph(query_bundle)
 
 
 class SpannerGraphCustomRetriever(CustomPGRetriever):
@@ -269,13 +270,12 @@ class SpannerGraphCustomRetriever(CustomPGRetriever):
         self,
         ## vector context retriever params
         embed_model: Optional[BaseEmbedding] = None,
-        vector_store: Optional[VectorStore] = None,
+        vector_store: Optional[BasePydanticVectorStore] = None,
         similarity_top_k: int = 4,
         path_depth: int = 2,
         ## text-to-gql params
         llm_text_to_gql: Optional[LLM] = None,
         text_to_gql_prompt: Optional[PromptTemplate] = None,
-        response_template: Optional[str] = None,
         gql_validator: Optional[Callable[[str], bool]] = None,
         include_raw_response_as_metadata: Optional[bool] = False,
         max_gql_fix_retries: Optional[int] = 1,
@@ -297,7 +297,6 @@ class SpannerGraphCustomRetriever(CustomPGRetriever):
           path_depth: The depth of the path to retrieve.
           llm_text_to_gql: The LLM to use for text to GQL conversion.
           text_to_gql_prompt: The prompt to use for generating the GQL query.
-          response_template: The template to use for formatting the response.
           gql_validator: A function to validate the GQL query.
           include_raw_response_as_metadata: Whether to include the raw response as
             metadata.
@@ -311,6 +310,12 @@ class SpannerGraphCustomRetriever(CustomPGRetriever):
           llmranker_top_n: The number of top nodes to return.
           **kwargs: Additional keyword arguments.
         """
+
+        if not isinstance(self._graph_store, SpannerPropertyGraphStore):
+            raise TypeError(
+                "SpannerGraphCustomRetriever requires a SpannerPropertyGraphStore."
+        )
+    
         self.llm = llm_text_to_gql or Settings.llm
         if self.llm is None:
             raise ValueError("`llm for Text to GQL` cannot be none")
@@ -328,7 +333,6 @@ class SpannerGraphCustomRetriever(CustomPGRetriever):
             graph_store=self._graph_store,
             llm=llm_text_to_gql,
             text_to_gql_prompt=text_to_gql_prompt,
-            response_template=response_template,
             gql_validator=gql_validator,
             include_raw_response_as_metadata=include_raw_response_as_metadata,
             max_gql_fix_retries=max_gql_fix_retries,
@@ -342,7 +346,7 @@ class SpannerGraphCustomRetriever(CustomPGRetriever):
             top_n=llmranker_top_n,
         )
 
-    def generate_synthesized_response(self, question: str, response: str) -> float:
+    def generate_synthesized_response(self, question: str, response: str) -> str:
         gql_synthesized_response = self.llm.predict(
             GQL_SYNTHESIS_RESPONSE_TEMPLATE,
             question=question,
