@@ -1,4 +1,5 @@
 [run]
+parallel = true
 branch = true
 omit =
     */__init__.py
