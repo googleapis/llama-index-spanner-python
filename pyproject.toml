@@ -10,7 +10,7 @@ authors = [
 ]
 dependencies = [
     "google-cloud-spanner>=3.41.0, <4.0.0",
-    "llama-index-core==0.12.41"
+    "llama-index-core==0.12.48"
 ]
 classifiers = [
     "Intended Audience :: Developers",
@@ -73,15 +73,3 @@ exclude = [
     'docs/*',
     'noxfile.py'
 ]
-
-[tool.pytest.ini_options]
-addopts = "-n auto --cov=llama_index_spanner --cov-report=term-missing --cov-fail-under=81"
-
-[tool.coverage.run]
-parallel = true
-branch = true
-source = ["llama_index_spanner"]
-omit = ["*/__init__.py"]
-
-[tool.coverage.report]
-show_missing = true
