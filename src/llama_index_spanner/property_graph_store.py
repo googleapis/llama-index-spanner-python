@@ -15,7 +15,9 @@
 import itertools
 import json
 from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
+from google.cloud import spanner  # type: ignore
 from google.cloud import spanner  # type: ignore
 from llama_index.core.graph_stores.types import (
     ChunkNode,
@@ -26,6 +28,7 @@ from llama_index.core.graph_stores.types import (
     Triplet,
 )
 from llama_index.core.prompts import PromptTemplate, PromptType
+from llama_index.core.vector_stores.types import MetadataFilter, VectorStoreQuery
 from llama_index.core.vector_stores.types import MetadataFilter, VectorStoreQuery
 
 from .prompts import DEFAULT_SPANNER_GQL_TEMPLATE
@@ -94,6 +97,7 @@ def edge_from_json(json_edge_properties: Dict[str, Any]) -> Relation:
       A Relation.
     """
     source_id, target_id, properties, label = "", "", {}, ""
+    source_id, target_id, properties, label = "", "", {}, ""
     for k, v in json_edge_properties.items():
         if k == ElementSchema.NODE_KEY_COLUMN_NAME:
             source_id = v
@@ -116,6 +120,7 @@ def edge_from_json(json_edge_properties: Dict[str, Any]) -> Relation:
 def update_condition(
     cond: List[str],
     params: Dict[str, Any],
+    schema: SpannerGraphSchema,
     schema: SpannerGraphSchema,
     ids: Optional[List[str]] = None,
     properties: Optional[Dict[str, Any]] = None,
@@ -252,6 +257,7 @@ class SpannerPropertyGraphStore(PropertyGraphStore):
         return self.impl
 
     def upsert_nodes(self, nodes: Sequence[LabelledNode]) -> None:
+    def upsert_nodes(self, nodes: Sequence[LabelledNode]) -> None:
         """Upserts nodes into the graph store.
 
         This method takes a list of LabelledNodes and upserts them into the
@@ -373,6 +379,7 @@ class SpannerPropertyGraphStore(PropertyGraphStore):
         )
         cond = ["1 = 1"]
         params: Dict[str, Any] = {}
+        params: Dict[str, Any] = {}
 
         if not update_condition(
             cond, params, self.schema, ids=ids, properties=properties
@@ -416,6 +423,7 @@ class SpannerPropertyGraphStore(PropertyGraphStore):
         label_field = ElementSchema.DYNAMIC_LABEL_COLUMN_NAME
 
         cond = ["1 = 1"]
+        params: Dict[str, Any] = {}
         params: Dict[str, Any] = {}
 
         if not update_condition(
@@ -552,6 +560,8 @@ class SpannerPropertyGraphStore(PropertyGraphStore):
 
         cond: List[str] = []
         params: Dict[str, Any] = {}
+        cond: List[str] = []
+        params: Dict[str, Any] = {}
 
         if (
             update_condition(
@@ -580,6 +590,7 @@ class SpannerPropertyGraphStore(PropertyGraphStore):
                 ):
                     self.impl.delete(
                         self.schema.labels[node_table_label].base_table_name,
+                        [[node_id] for _, node_id in nodes],
                         [[node_id] for _, node_id in nodes],
                     )
 
@@ -610,6 +621,10 @@ class SpannerPropertyGraphStore(PropertyGraphStore):
                     ):
                         self.impl.delete(
                             self.schema.labels[edge_label].base_table_name,
+                            [
+                                [edge_id, edge_target_id, edge_label]
+                                for _, edge_id, edge_target_id, edge_label in edges
+                            ],
                             [
                                 [edge_id, edge_target_id, edge_label]
                                 for _, edge_id, edge_target_id, edge_label in edges
@@ -673,6 +688,7 @@ class SpannerPropertyGraphStore(PropertyGraphStore):
           - A list of floats, representing the similarity scores of the nodes.
         """
         if not self.schema.graph_exists or query.query_embedding is None:
+        if not self.schema.graph_exists or query.query_embedding is None:
             return ([], [])
 
         query_condition = "1 = 1"
@@ -683,6 +699,11 @@ class SpannerPropertyGraphStore(PropertyGraphStore):
         if query.filters:
             cond = []
             for i, query_filter in enumerate(query.filters.filters):
+                if not isinstance(
+                    query_filter, MetadataFilter
+                ):  # doesn't support nested MetadataFilters
+                    continue
+
                 if not isinstance(
                     query_filter, MetadataFilter
                 ):  # doesn't support nested MetadataFilters
