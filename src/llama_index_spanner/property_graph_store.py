@@ -257,7 +257,6 @@ class SpannerPropertyGraphStore(PropertyGraphStore):
         return self.impl
 
     def upsert_nodes(self, nodes: Sequence[LabelledNode]) -> None:
-    def upsert_nodes(self, nodes: Sequence[LabelledNode]) -> None:
         """Upserts nodes into the graph store.
 
         This method takes a list of LabelledNodes and upserts them into the
@@ -687,7 +686,6 @@ class SpannerPropertyGraphStore(PropertyGraphStore):
           - A list of LabelledNodes, representing the nodes that were found.
           - A list of floats, representing the similarity scores of the nodes.
         """
-        if not self.schema.graph_exists or query.query_embedding is None:
         if not self.schema.graph_exists or query.query_embedding is None:
             return ([], [])
 

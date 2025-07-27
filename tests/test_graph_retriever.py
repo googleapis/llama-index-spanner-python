@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import pytest
 from llama_index.core import PropertyGraphIndex, Settings
 from llama_index.core.graph_stores.types import ChunkNode, EntityNode, Relation
 from llama_index.core.indices.property_graph import SchemaLLMPathExtractor
 from llama_index.core.query_engine import RetrieverQueryEngine
+from llama_index.llms.google_genai import GoogleGenAI
 from llama_index.readers.wikipedia import WikipediaReader
 
 from llama_index_spanner.graph_retriever import (
@@ -24,6 +26,8 @@ from llama_index_spanner.graph_retriever import (
     SpannerGraphTextToGQLRetriever,
 )
 from tests.utils import get_random_suffix, get_resources
+
+google_api_key = os.environ.get("GOOGLE_API_KEY")
 
 
 def setup(schema_type):
@@ -37,13 +41,17 @@ def setup(schema_type):
     loader = WikipediaReader()
     documents = loader.load_data(pages=["Google"], auto_suggest=False)
 
+    index_llm = GoogleGenAI(
+        model="gemini-1.5-pro-latest",
+        api_key=google_api_key,
+    )
     PropertyGraphIndex.from_documents(
         documents,
         embed_model=embed_model,
         embed_kg_nodes=True,
         kg_extractors=[
             SchemaLLMPathExtractor(
-                llm=llm,
+                llm=index_llm,
                 max_triplets_per_chunk=1000,
                 num_workers=4,
             )
