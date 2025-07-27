@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+
 import pytest
 from llama_index.core import PropertyGraphIndex, Settings
 from llama_index.core.graph_stores.types import ChunkNode, EntityNode, Relation
