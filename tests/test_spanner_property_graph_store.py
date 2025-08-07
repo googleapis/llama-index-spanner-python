@@ -756,7 +756,9 @@ def test_get_rel_map_depth_variations_and_limit(
         labels_d2 = sorted(
             [t[1].label for t in triplets_d2]
         )  # Use sorted list for potential duplicates if any
-        target_names_d2 = sorted([t[2].name for t in triplets_d2 if isinstance(t[2], EntityNode)])
+        target_names_d2 = sorted(
+            [t[2].name for t in triplets_d2 if isinstance(t[2], EntityNode)]
+        )
         assert sorted(["TO_B", "TO_C", "TO_F"]) == labels_d2
         # Targets will be B (from A-B), C (from B-C), F (from A-F)
         assert sorted(["B", "C", "F"]) == target_names_d2
@@ -1091,7 +1093,9 @@ def test_delete_nodes_with_multiple_criteria(
         # Delete ITEM named "Book" AND category "Fiction"
         graph_store.delete(entity_names=["Book"], properties={"category": "Fiction"})
         remaining_nodes_c2 = graph_store.get()
-        remaining_names_c2 = {n.name for n in remaining_nodes_c2 if isinstance(n, EntityNode)}
+        remaining_names_c2 = {
+            n.name for n in remaining_nodes_c2 if isinstance(n, EntityNode)
+        }
         assert "Book" not in remaining_names_c2
         # Case 3: Criteria that match nothing when combined
         graph_store.delete(
