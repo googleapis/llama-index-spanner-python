@@ -30,7 +30,7 @@ Learn more by reading [How should I write my commits?](https://github.com/google
 
 ### CI Platform Setup
 
-Cloud Build is used to run tests against Google Cloud resources in test project: langchain-spanner-testing.
+Cloud Build is used to run tests against Google Cloud resources in test project: llamaindex-spanner-testing.
 Each test has a corresponding Cloud Build trigger, see [all triggers][triggers].
 These tests are registered as required tests in `.github/sync-repo-settings.yaml`.
 
@@ -43,7 +43,7 @@ name: integration-test-pr-py39
 description: Run integration tests on PR for Python 3.9
 filename: integration.cloudbuild.yaml
 github:
-  name: langchain-google-spanner-python
+  name: llama-index-spanner-python
   owner: googleapis
   pullRequest:
     branch: .*
@@ -54,9 +54,9 @@ ignoredFiles:
   - .github/**
   - "*.md"
 substitutions:
-  _INSTANCE_ID: <ADD_VALUE>
-  _PG_DATABASE: <ADD_VALUE>
-  _GOOGLE_DATABASE: <ADD_VALUE>
+  _SPANNER_INSTANCE_ID: <ADD_VALUE>
+  _SPANNER_DATABASE_ID: <ADD_VALUE>
+  _SPANNER_GRAPH_NAME: <ADD_VALUE>
   _VERSION: "3.9"
 ```
 
@@ -92,4 +92,4 @@ Here is a breakdown of the report:
 - `Missing`: lines that are not covered by tests.
 
 
-[triggers]: https://console.cloud.google.com/cloud-build/triggers?e=13802955&project=langchain-spanner-testing
+[triggers]: https://pantheon.corp.google.com/cloud-build/triggers?e=13802955&project=llamaindex-spanner-testing

@@ -70,6 +70,7 @@ profile = "black"
 python_version = 3.9
 warn_unused_configs = true
 ignore_missing_imports = true
+namespace_packages = true
 
 exclude = [
     'docs/*',
