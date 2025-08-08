@@ -79,10 +79,10 @@ class SpannerGraphTextToGQLRetriever(BasePGRetriever):
         llm: Optional[LLM] = None,
         text_to_gql_prompt: Optional[PromptTemplate] = None,
         gql_validator: Optional[Callable[[str], bool]] = None,
-        include_raw_response_as_metadata: Optional[bool] = False,
-        max_gql_fix_retries: Optional[int] = 1,
-        verify_gql: Optional[bool] = True,
-        summarize_response: Optional[bool] = False,
+        include_raw_response_as_metadata: bool = False,
+        max_gql_fix_retries: int = 1,
+        verify_gql: bool = True,
+        summarize_response: bool = False,
         summarization_template: Optional[Union[PromptTemplate, str]] = None,
         **kwargs,
     ) -> None:
@@ -156,9 +156,7 @@ class SpannerGraphTextToGQLRetriever(BasePGRetriever):
             A tuple containing the final GQL query and the list of responses.
         """
         retries = 0
-        max_retries = (
-            self.max_gql_fix_retries if self.max_gql_fix_retries is not None else 1
-        )
+        max_retries = self.max_gql_fix_retries
         while retries <= max_retries:
             try:
                 return gql_query, self.execute_query(gql_query)
@@ -282,10 +280,10 @@ class SpannerGraphCustomRetriever(CustomPGRetriever):
         llm_text_to_gql: Optional[LLM] = None,
         text_to_gql_prompt: Optional[PromptTemplate] = None,
         gql_validator: Optional[Callable[[str], bool]] = None,
-        include_raw_response_as_metadata: Optional[bool] = False,
-        max_gql_fix_retries: Optional[int] = 1,
-        verify_gql: Optional[bool] = True,
-        summarize_response: Optional[bool] = False,
+        include_raw_response_as_metadata: bool = False,
+        max_gql_fix_retries: int = 1,
+        verify_gql: bool = True,
+        summarize_response: bool = False,
         summarization_template: Optional[Union[PromptTemplate, str]] = None,
         ## LLM reranker params
         llm_for_reranker: Optional[LLM] = None,

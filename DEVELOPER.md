@@ -72,7 +72,7 @@ Use `gcloud builds triggers import --source=trigger.yaml` to create triggers via
 * Run integration test:
 
     ```bash
-    gcloud builds submit --config integration.cloudbuild.yaml --region us-central1 --substitutions=_INSTANCE_ID=$INSTANCE_ID
+    gcloud builds submit --config integration.cloudbuild.yaml --region us-central1 --substitutions=_SPANNER_INSTANCE_ID=$_SPANNER_INSTANCE_ID
     ```
 
 #### Trigger
@@ -92,4 +92,4 @@ Here is a breakdown of the report:
 - `Missing`: lines that are not covered by tests.
 
 
-[triggers]: https://pantheon.corp.google.com/cloud-build/triggers?e=13802955&project=llamaindex-spanner-testing
+[triggers]: https://console.cloud.google.com/cloud-build/triggers?e=13802955&project=llamaindex-spanner-testing

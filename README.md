@@ -111,8 +111,9 @@ retriever = SpannerGraphCustomRetriever(
     similarity_top_k=4,
     path_depth=2,
     graph_store=graph_store,
-    llm=llm,
+    llm_text_to_gql=llm,
     embed_model=embed_model,
+    llmranker_top_n=3,
 )
 retriever.retriever("Who lives in desert?")
 ```
