@@ -5,7 +5,7 @@
 
 ### Miscellaneous Chores
 
-* Release 0.1.1 ([#22](https://github.com/googleapis/llama-index-spanner-python/issues/22)) ([cdbe778](https://github.com/googleapis/llama-index-spanner-python/commit/cdbe778346ac9ddbe08f48bed8d747d3b959705e))
+* Fix links and mypy issues ([#21](https://github.com/googleapis/llama-index-spanner-python/issues/21)) ([324bc3a](https://github.com/googleapis/llama-index-spanner-python/pull/21/commits/324bc3a3ea3326a4b703f5ffb16bdae16ba77058))
 
 ## 0.1.0 (2025-07-28)
 
