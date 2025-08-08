@@ -156,8 +156,7 @@ class SpannerGraphTextToGQLRetriever(BasePGRetriever):
             A tuple containing the final GQL query and the list of responses.
         """
         retries = 0
-        max_retries = self.max_gql_fix_retries
-        while retries <= max_retries:
+        while retries <= self.max_gql_fix_retries:
             try:
                 return gql_query, self.execute_query(gql_query)
             except Exception as e:
