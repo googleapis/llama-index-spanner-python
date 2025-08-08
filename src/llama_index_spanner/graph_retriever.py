@@ -79,10 +79,10 @@ class SpannerGraphTextToGQLRetriever(BasePGRetriever):
         llm: Optional[LLM] = None,
         text_to_gql_prompt: Optional[PromptTemplate] = None,
         gql_validator: Optional[Callable[[str], bool]] = None,
-        include_raw_response_as_metadata: Optional[bool] = False,
-        max_gql_fix_retries: Optional[int] = 1,
-        verify_gql: Optional[bool] = True,
-        summarize_response: Optional[bool] = False,
+        include_raw_response_as_metadata: bool = False,
+        max_gql_fix_retries: int = 1,
+        verify_gql: bool = True,
+        summarize_response: bool = False,
         summarization_template: Optional[Union[PromptTemplate, str]] = None,
         **kwargs,
     ) -> None:
@@ -132,7 +132,9 @@ class SpannerGraphTextToGQLRetriever(BasePGRetriever):
 
     def _validate_generated_gql(self, gql_query: str) -> str:
         if self.gql_validator is not None:
-            return self.gql_validator(gql_query)
+            is_valid = self.gql_validator(gql_query)
+            if not is_valid:
+                raise ValueError(f"Generated GQL is not valid: {gql_query}")
         return gql_query
 
     def execute_query(self, gql_query: str) -> List[Any]:
@@ -277,10 +279,10 @@ class SpannerGraphCustomRetriever(CustomPGRetriever):
         llm_text_to_gql: Optional[LLM] = None,
         text_to_gql_prompt: Optional[PromptTemplate] = None,
         gql_validator: Optional[Callable[[str], bool]] = None,
-        include_raw_response_as_metadata: Optional[bool] = False,
-        max_gql_fix_retries: Optional[int] = 1,
-        verify_gql: Optional[bool] = True,
-        summarize_response: Optional[bool] = False,
+        include_raw_response_as_metadata: bool = False,
+        max_gql_fix_retries: int = 1,
+        verify_gql: bool = True,
+        summarize_response: bool = False,
         summarization_template: Optional[Union[PromptTemplate, str]] = None,
         ## LLM reranker params
         llm_for_reranker: Optional[LLM] = None,
