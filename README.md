@@ -111,8 +111,9 @@ retriever = SpannerGraphCustomRetriever(
     similarity_top_k=4,
     path_depth=2,
     graph_store=graph_store,
-    llm=llm,
+    llm_text_to_gql=llm,
     embed_model=embed_model,
+    llmranker_top_n=3,
 )
 retriever.retriever("Who lives in desert?")
 ```
@@ -123,12 +124,12 @@ See the full [Spanner Graph Retrievers](https://github.com/googleapis/llama-inde
 
 Contributions to this library are always welcome and highly encouraged.
 
-See [CONTRIBUTING](CONTRIBUTING.md) for more information how to get started.
+See [CONTRIBUTING](https://github.com/googleapis/llama-index-spanner-python/blob/main/CONTRIBUTING.md) for more information how to get started.
 
 Please note that this project is released with a Contributor Code of Conduct. By participating in
-this project you agree to abide by its terms. See [Code of Conduct](CODE_OF_CONDUCT.md) for more
+this project you agree to abide by its terms. See [Code of Conduct](https://github.com/googleapis/llama-index-spanner-python/blob/main/CODE_OF_CONDUCT.md) for more
 information.
 
 ## License
 
-Apache 2.0 - See [LICENSE](LICENSE) for more information.
+Apache 2.0 - See [LICENSE](https://github.com/googleapis/llama-index-spanner-python/blob/main/LICENSE) for more information.

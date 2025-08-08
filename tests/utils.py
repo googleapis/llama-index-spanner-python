@@ -15,7 +15,7 @@
 import os
 import random
 
-from google.cloud import spanner
+from google.cloud import spanner  # type: ignore
 from llama_index.core.storage import StorageContext
 from llama_index.embeddings.google_genai import GoogleGenAIEmbedding
 from llama_index.llms.google_genai import GoogleGenAI
