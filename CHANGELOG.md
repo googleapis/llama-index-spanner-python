@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/googleapis/llama-index-spanner-python/compare/v0.1.0...v0.1.1) (2025-08-08)
+
+
+### Miscellaneous Chores
+
+* Release 0.1.1 ([#22](https://github.com/googleapis/llama-index-spanner-python/issues/22)) ([cdbe778](https://github.com/googleapis/llama-index-spanner-python/commit/cdbe778346ac9ddbe08f48bed8d747d3b959705e))
+
 ## 0.1.0 (2025-07-28)
 
 
