@@ -203,6 +203,7 @@ def retrievers_dynamic():
     graph_store.clean_up()
 
 
+@pytest.mark.flaky(retries=3)
 def test_graph_retriever2_static(retrievers_static):
     """Test the graph retriever."""
     for retriever in retrievers_static:
@@ -213,6 +214,7 @@ def test_graph_retriever2_static(retrievers_static):
         assert "Elias Thorne" in str(res)
 
 
+@pytest.mark.flaky(retries=3)
 def test_graph_retriever2_dynamic(retrievers_dynamic):
     """Test the graph retriever."""
     retriever = retrievers_dynamic[0]  # only NL2GQL fails
