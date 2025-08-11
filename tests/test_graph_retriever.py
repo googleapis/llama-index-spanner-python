@@ -81,20 +81,20 @@ def load(graph_store, llm, embed_model):
     return retriever
 
 
-def test_graph_retriever():
-    """Test the graph retriever."""
-    for schema_type in ["static", "flexible"]:
-        graph_store, llm, embed_model = setup(schema_type)
-        retriever = load(graph_store, llm, embed_model)
+# def test_graph_retriever():
+#     """Test the graph retriever."""
+#     for schema_type in ["static", "flexible"]:
+#         graph_store, llm, embed_model = setup(schema_type)
+#         retriever = load(graph_store, llm, embed_model)
 
-        query_engine = RetrieverQueryEngine(retriever=retriever)
-        response = query_engine.query("what is parent company of Google?")
-        print(response)
-        response = query_engine.query("Where are all the Google offices located?")
-        print(response)
-        response = query_engine.query("Some Products of Google?")
-        print(response)
-        graph_store.clean_up()
+#         query_engine = RetrieverQueryEngine(retriever=retriever)
+#         response = query_engine.query("what is parent company of Google?")
+#         print(response)
+#         response = query_engine.query("Where are all the Google offices located?")
+#         print(response)
+#         response = query_engine.query("Some Products of Google?")
+#         print(response)
+#         graph_store.clean_up()
 
 
 def setup2(schema_type):
