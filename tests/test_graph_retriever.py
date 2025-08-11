@@ -223,3 +223,8 @@ def test_graph_retriever2_dynamic(retrievers_dynamic):
 
     res = retriever.retrieve("Who lives in desert?")
     assert "Elias Thorne" in str(res)
+
+
+@pytest.mark.flaky(retries=3, only_on=[AssertionError], delay=1)
+def test_all_retry_fail():
+    assert False
