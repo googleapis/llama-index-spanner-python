@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/googleapis/llama-index-spanner-python/compare/v0.1.1...v0.1.2) (2025-08-11)
+
+
+### Bug Fixes
+
+* Pytest retry for flaky test ([#25](https://github.com/googleapis/llama-index-spanner-python/issues/25)) ([f5d1179](https://github.com/googleapis/llama-index-spanner-python/commit/f5d1179ea28501152d44254812b4b894f4adf46c))
+
 ## [0.1.1](https://github.com/googleapis/llama-index-spanner-python/compare/v0.1.0...v0.1.1) (2025-08-08)
 
 
