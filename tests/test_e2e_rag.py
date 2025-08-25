@@ -28,7 +28,7 @@ def index_and_models(request):
     """Setup the index for integration tests."""
     schema_type = request.param
     graph_store, _, query_llm, embed_model = get_resources(
-        f"whole_flow_{schema_type}_{get_random_suffix()}",
+        f"e2e_rag_{schema_type}_{get_random_suffix()}",
         clean_up=True,
         use_flexible_schema=(schema_type == "flexible"),
     )
@@ -63,9 +63,9 @@ def index_and_models(request):
 
 
 @pytest.mark.flaky(retries=3, only_on=[AssertionError], delay=1)
-def test_whole_flow(index_and_models):
+def test_e2e_rag(index_and_models):
     """
-    Test the whole flow from document loading to querying with a custom retriever.
+    Test End-to-End RAG flow from document loading to querying with a custom retriever.
     This test is parameterized to run for both 'static' and 'flexible' schemas.
     """
     index, llm, embed_model = index_and_models
