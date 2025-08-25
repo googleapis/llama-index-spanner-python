@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import dotenv
 import os
 import random
 
+import dotenv
 from google.cloud import spanner  # type: ignore
 from llama_index.core.storage import StorageContext
 from llama_index.embeddings.google_genai import GoogleGenAIEmbedding

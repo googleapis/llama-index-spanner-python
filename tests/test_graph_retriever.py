@@ -247,7 +247,6 @@ def test_spanner_graph_text_to_gql_retriever_mocked():
     assert res[0].score == score
 
 
-
 def test_spanner_graph_custom_retriever_mocked():
     """Test SpannerGraphCustomRetriever with mocked dependencies to check reranker and synthesis calls."""
     mock_graph_store = MagicMock(spec=SpannerPropertyGraphStore)
@@ -257,13 +256,15 @@ def test_spanner_graph_custom_retriever_mocked():
     mock_llm = MagicMock()
     mock_reranker_llm = MagicMock()
 
-    with patch(
-        "llama_index_spanner.graph_retriever.VectorContextRetriever"
-    ) as mock_vector_retriever_cls, patch(
-        "llama_index_spanner.graph_retriever.SpannerGraphTextToGQLRetriever"
-    ) as mock_gql_retriever_cls, patch(
-        "llama_index_spanner.graph_retriever.LLMRerank"
-    ) as mock_reranker_cls:
+    with (
+        patch(
+            "llama_index_spanner.graph_retriever.VectorContextRetriever"
+        ) as mock_vector_retriever_cls,
+        patch(
+            "llama_index_spanner.graph_retriever.SpannerGraphTextToGQLRetriever"
+        ) as mock_gql_retriever_cls,
+        patch("llama_index_spanner.graph_retriever.LLMRerank") as mock_reranker_cls,
+    ):
         mock_vector_retriever = mock_vector_retriever_cls.return_value
         mock_gql_retriever = mock_gql_retriever_cls.return_value
         mock_reranker = mock_reranker_cls.return_value
