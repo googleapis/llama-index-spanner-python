@@ -18,9 +18,23 @@ Learn more by reading [How should I write my commits?](https://github.com/google
 
 ### Run tests locally
 
-1. Set environment variables for `SPANNER_INSTANCE_ID`, `SPANNER_DATABASE_ID`, `SPANNER_GRAPH_NAME`, `GEMINI_API_KEY` or `GOOGLE_API_KEY`
+1. Set environment variables for `PROJECT_ID`, `SPANNER_INSTANCE_ID`, `SPANNER_DATABASE_ID`, `SPANNER_GRAPH_NAME` and `GOOGLE_API_KEY`
 
-2. Run pytest to automatically run all tests:
+2. Create a virtual environment and install dependencies:
+    ```bash
+    # Create the virtual environment
+    python3 -m venv venv
+
+    # Activate the environment (on macOS/Linux)
+    source venv/bin/activate
+
+    # On Windows, use: venv\Scripts\activate
+
+    # Install all required packages
+    pip install .[dependencies,test,lint]
+    ```
+
+3. Run pytest to automatically run all tests:
 
     ```bash
     pytest

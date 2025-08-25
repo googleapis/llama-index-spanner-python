@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import dotenv
 import os
 import random
 
@@ -21,6 +22,8 @@ from llama_index.embeddings.google_genai import GoogleGenAIEmbedding
 from llama_index.llms.google_genai import GoogleGenAI
 
 from llama_index_spanner import SpannerPropertyGraphStore
+
+dotenv.load_dotenv()
 
 project_id = os.environ.get("PROJECT_ID") or "llamaindex-spanner-testing"
 spanner_instance_id = (
