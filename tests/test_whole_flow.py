@@ -62,7 +62,6 @@ def index_and_models(request):
     graph_store.clean_up()
 
 
-@pytest.mark.integration
 @pytest.mark.flaky(retries=3, only_on=[AssertionError], delay=1)
 def test_whole_flow(index_and_models):
     """
