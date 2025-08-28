@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/googleapis/llama-index-spanner-python/compare/v0.1.2...v0.1.3) (2025-08-26)
+
+
+### Bug Fixes
+
+* Tests and update DEVELOPER.md and env variable setup ([#28](https://github.com/googleapis/llama-index-spanner-python/issues/28)) ([ac5f8d2](https://github.com/googleapis/llama-index-spanner-python/commit/ac5f8d25fa2652d2f9f4c88ab87457212c149215))
+
 ## [0.1.2](https://github.com/googleapis/llama-index-spanner-python/compare/v0.1.1...v0.1.2) (2025-08-11)
 
 
