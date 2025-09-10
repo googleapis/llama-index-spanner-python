@@ -15,12 +15,15 @@
 import os
 import random
 
-from google.cloud import spanner
+import dotenv
+from google.cloud import spanner  # type: ignore
 from llama_index.core.storage import StorageContext
 from llama_index.embeddings.google_genai import GoogleGenAIEmbedding
 from llama_index.llms.google_genai import GoogleGenAI
 
 from llama_index_spanner import SpannerPropertyGraphStore
+
+dotenv.load_dotenv()
 
 project_id = os.environ.get("PROJECT_ID") or "llamaindex-spanner-testing"
 spanner_instance_id = (

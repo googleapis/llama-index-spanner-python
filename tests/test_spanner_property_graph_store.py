@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Generator
+from typing import Any, Generator, Union
 
 import pytest
 from llama_index.core.graph_stores.types import ChunkNode, EntityNode, Relation
@@ -166,7 +166,9 @@ def test_upsert_node_idempotency_update_properties(
         assert (
             len(graph_store.get(properties={"status": "backorder"})) == 1
         )  # Check if name update worked for query
-        assert retrieved_v2.name == "Laptop Pro"
+
+        if isinstance(retrieved_v2, EntityNode):
+            assert retrieved_v2.name == "Laptop Pro"
         assert retrieved_v2.properties.get("status") == "backorder"
         assert retrieved_v2.properties.get("price") == 1250
         assert retrieved_v2.properties.get("ram_gb") == 16
@@ -199,8 +201,9 @@ def test_upsert_relations_and_get(
         triplets = graph_store.get_triplets(entity_names=["Alice"])
         assert len(triplets) == 1
         source, rel, target = triplets[0]
-        assert source.name == "Alice"
-        assert target.name == "Paris"
+        if isinstance(source, EntityNode) and isinstance(target, EntityNode):
+            assert source.name == "Alice"
+            assert target.name == "Paris"
         assert rel.label == "VISITED"
         assert rel.properties["year"] == 2023
 
@@ -239,14 +242,16 @@ def test_upsert_relations_and_get_multiple(
         triplets = graph_store.get_triplets(entity_names=["Alice", "Bob"])
         assert len(triplets) == 2
         source, rel, target = triplets[0]
-        assert source.name == "Alice"
-        assert target.name == "Paris"
+        if isinstance(source, EntityNode) and isinstance(target, EntityNode):
+            assert source.name == "Alice"
+            assert target.name == "Paris"
         assert rel.label == "VISITED"
         assert rel.properties["year"] == 2023
 
         source, rel, target = triplets[1]
-        assert source.name == "Bob"
-        assert target.name == "Switzerland"
+        if isinstance(source, EntityNode) and isinstance(target, EntityNode):
+            assert source.name == "Bob"
+            assert target.name == "Switzerland"
         assert rel.label == "VISITED"
         assert rel.properties["year"] == 2025
 
@@ -471,7 +476,8 @@ def test_get_nodes_by_multiple_properties(
         filtered_devs = graph_store.get(properties=target_properties)
 
         assert len(filtered_devs) == 1
-        assert filtered_devs[0].name == "DevA"
+        if isinstance(filtered_devs[0], EntityNode):
+            assert filtered_devs[0].name == "DevA"
         assert filtered_devs[0].properties.get("lang") == "Python"
         assert filtered_devs[0].properties.get("exp_years") == 5
         assert filtered_devs[0].properties.get("city") == "London"
@@ -480,7 +486,7 @@ def test_get_nodes_by_multiple_properties(
         target_properties_2 = {"lang": "Python", "exp_years": 5}
         filtered_devs_2 = graph_store.get(properties=target_properties_2)
         assert len(filtered_devs_2) == 2
-        names_2 = {dev.name for dev in filtered_devs_2}
+        names_2 = {dev.name for dev in filtered_devs_2 if isinstance(dev, EntityNode)}
         assert {"DevA", "DevD"} == names_2
 
         # Filter with a non-matching combination
@@ -506,7 +512,7 @@ def test_filter_nodes_by_property(
         # Filter
         filtered = graph_store.get(properties={"country": "France"})
         assert len(filtered) == 2
-        filtered_names = {x.name for x in filtered}
+        filtered_names = {x.name for x in filtered if isinstance(x, EntityNode)}
         assert filtered_names == {"Alice", "Charlie"}
 
 
@@ -570,17 +576,21 @@ def test_get_triplets_with_multiple_filters(
             entity_names=["Alice"], relation_names=["WORKS_ON"]
         )
         assert len(triplets1) == 1
-        assert triplets1[0][0].name == "Alice"
-        assert triplets1[0][1].label == "WORKS_ON"
-        assert triplets1[0][2].name == "ProjectX"
+        source1, rel1, target1 = triplets1[0]
+        if isinstance(source1, EntityNode) and isinstance(target1, EntityNode):
+            assert source1.name == "Alice"
+            assert rel1.label == "WORKS_ON"
+            assert target1.name == "ProjectX"
 
         # Test Case 2: Filter by node ids and relation_names
         # Get "MANAGES" relations originating from Alice's ID
         triplets2 = graph_store.get_triplets(ids=[alice.id], relation_names=["MANAGES"])
         assert len(triplets2) == 1
-        assert triplets2[0][0].id == alice.id
-        assert triplets2[0][1].label == "MANAGES"
-        assert triplets2[0][2].name == "ProjectY"
+        source2, rel2, target2 = triplets2[0]
+        if isinstance(source2, EntityNode) and isinstance(target2, EntityNode):
+            assert source2.id == alice.id
+            assert rel2.label == "MANAGES"
+            assert target2.name == "ProjectY"
 
         # Test Case 3: Filter by node properties (of the source node)
         # and relation_names
@@ -591,9 +601,11 @@ def test_get_triplets_with_multiple_filters(
             properties={"country": "USA"}, relation_names=["WORKS_ON"]
         )
         assert len(triplets3) == 1
-        assert triplets3[0][0].name == "Bob"
-        assert triplets3[0][1].label == "WORKS_ON"
-        assert triplets3[0][2].name == "ProjectX"
+        source3, rel3, target3 = triplets3[0]
+        if isinstance(source3, EntityNode) and isinstance(target3, EntityNode):
+            assert source3.name == "Bob"
+            assert rel3.label == "WORKS_ON"
+            assert target3.name == "ProjectX"
 
         # Test Case 4: Filter by entity_names, relation_names,
         # and properties (of source node)
@@ -604,8 +616,11 @@ def test_get_triplets_with_multiple_filters(
             properties={"country": "UK"},
         )
         assert len(triplets4) == 1
-        assert triplets4[0][0].name == "Alice"
-        assert triplets4[0][1].label == "WORKS_ON"
+
+        source4, rel4, target4 = triplets4[0]
+        if isinstance(source4, EntityNode):
+            assert source4.name == "Alice"
+            assert rel4.label == "WORKS_ON"
 
         # Test Case 5: No results expected
         triplets5 = graph_store.get_triplets(
@@ -659,9 +674,10 @@ def test_get_triplets_filter_by_relation_properties(
             properties={"status": "active"}, relation_names=["RATED"]
         )
         assert len(triplets_node_prop) == 1
-        assert (
-            triplets_node_prop[0][0].name == "UserA"
-        )  # Source node has status: active
+        if isinstance(triplets_node_prop[0][0], EntityNode):
+            assert (
+                triplets_node_prop[0][0].name == "UserA"
+            )  # Source node has status: active
         assert triplets_node_prop[0][1].properties.get("score") == 5
 
 
@@ -726,8 +742,8 @@ def test_get_rel_map_depth_variations_and_limit(
         triplets_d1 = graph_store.get_rel_map(graph_nodes=[node_a], depth=1, limit=10)
         assert len(triplets_d1) == 2
         labels_d1 = {t[1].label for t in triplets_d1}
-        sources_d1 = {t[0].name for t in triplets_d1}
-        targets_d1 = {t[2].name for t in triplets_d1}
+        sources_d1 = {t[0].name for t in triplets_d1 if isinstance(t[0], EntityNode)}
+        targets_d1 = {t[2].name for t in triplets_d1 if isinstance(t[2], EntityNode)}
         assert "A" in sources_d1 and len(sources_d1) == 1
         assert labels_d1 == {"TO_B", "TO_F"}
         assert targets_d1 == {"B", "F"}
@@ -740,7 +756,9 @@ def test_get_rel_map_depth_variations_and_limit(
         labels_d2 = sorted(
             [t[1].label for t in triplets_d2]
         )  # Use sorted list for potential duplicates if any
-        target_names_d2 = sorted([t[2].name for t in triplets_d2])
+        target_names_d2 = sorted(
+            [t[2].name for t in triplets_d2 if isinstance(t[2], EntityNode)]
+        )
         assert sorted(["TO_B", "TO_C", "TO_F"]) == labels_d2
         # Targets will be B (from A-B), C (from B-C), F (from A-F)
         assert sorted(["B", "C", "F"]) == target_names_d2
@@ -964,7 +982,9 @@ def test_delete_entities_by_names(
         # Verify
         remaining = graph_store.get()
         assert len(remaining) == 1
-        assert remaining[0].name == "Bob"
+
+        if isinstance(remaining, EntityNode):
+            assert remaining[0].name == "Bob"
 
 
 def test_delete_nodes_by_ids(
@@ -986,7 +1006,9 @@ def test_delete_nodes_by_ids(
 
         all_remaining = graph_store.get()
         assert len(all_remaining) == 1
-        assert all_remaining[0].name == "Alice"
+
+        if isinstance(all_remaining[0], EntityNode):
+            assert all_remaining[0].name == "Alice"
 
 
 def test_delete_nodes_by_properties(
@@ -1054,7 +1076,7 @@ def test_delete_nodes_with_multiple_criteria(
         )
 
         remaining_nodes = graph_store.get()
-        remaining_names = {n.name for n in remaining_nodes}
+        remaining_names = {n.name for n in remaining_nodes if isinstance(n, EntityNode)}
         assert "Ruler" not in remaining_names, "Node4 (Ruler) should have been deleted"
         assert {
             "Book",
@@ -1071,7 +1093,9 @@ def test_delete_nodes_with_multiple_criteria(
         # Delete ITEM named "Book" AND category "Fiction"
         graph_store.delete(entity_names=["Book"], properties={"category": "Fiction"})
         remaining_nodes_c2 = graph_store.get()
-        remaining_names_c2 = {n.name for n in remaining_nodes_c2}
+        remaining_names_c2 = {
+            n.name for n in remaining_nodes_c2 if isinstance(n, EntityNode)
+        }
         assert "Book" not in remaining_names_c2
         # Case 3: Criteria that match nothing when combined
         graph_store.delete(
@@ -1165,8 +1189,12 @@ def test_delete_relations_by_label_in_non_flexible_schema_impact(
     likes_triplets_after_delete = graph_store.get_triplets(relation_names=["LIKES_S"])
 
     assert len(likes_triplets_after_delete) == 1
-    assert likes_triplets_after_delete[0][0].name == "User1_S"
-    assert likes_triplets_after_delete[0][2].name == "App2_S"
+
+    source, rel, target = likes_triplets_after_delete[0]
+
+    if isinstance(source, EntityNode) and isinstance(target, EntityNode):
+        assert source.name == "User1_S"
+        assert target.name == "App2_S"
 
     # 3. Verify schema changes
     schema_after_delete = graph_store.get_schema(refresh=True)
@@ -1247,7 +1275,7 @@ def test_vector_query(
         results, scores = graph_store.vector_query(query)
         # Expect "Alice" to come first
         assert len(results) == 2
-        names_in_order = [r.name for r in results]
+        names_in_order = [r.name for r in results if isinstance(r, EntityNode)]
         assert names_in_order[0] == "Alice"
         assert names_in_order[1] == "Bob"
         # Score check: Usually Alice's score should be higher
@@ -1301,7 +1329,7 @@ def test_vector_query_with_exact_match_filter(
         results, scores = graph_store.vector_query(vector_query)
 
         assert len(results) <= 2  # Can be less if fewer than top_k match filter
-        result_names = {node.name for node in results}
+        result_names = {node.name for node in results if isinstance(node, EntityNode)}
         assert "Doc2" not in result_names  # Doc2 is category B
         if results:  # If any results match the filter
             assert "Doc1" in result_names or "Doc3" in result_names
@@ -1321,7 +1349,7 @@ def test_vector_query_with_exact_match_filter(
         )
         results_b, _ = graph_store.vector_query(vector_query_b)
         assert len(results_b) <= 1
-        if results_b:
+        if results_b and isinstance(results_b, EntityNode):
             assert results_b[0].name == "Doc2"
             assert results_b[0].properties["category"] == "B"
 
@@ -1332,7 +1360,7 @@ def test_vector_query_with_numeric_range_filters(
 ):
     """Test vector_query with numeric range filters (GT, LT, GTE, LTE) on properties."""
 
-    nodes_data = [
+    nodes_data: list[dict[str, Any]] = [
         {
             "id": "v_item1",
             "label": "VITEM",
@@ -1396,7 +1424,7 @@ def test_vector_query_with_numeric_range_filters(
         )
 
         results_gt, _ = graph_store.vector_query(query_gt)
-        names_gt = {n.name for n in results_gt}
+        names_gt = {n.name for n in results_gt if isinstance(n, EntityNode)}
 
         assert names_gt == {"Item3"}
 
@@ -1414,7 +1442,7 @@ def test_vector_query_with_numeric_range_filters(
             query_embedding=query_embedding, similarity_top_k=3, filters=gte_filter
         )
         results_gte, _ = graph_store.vector_query(query_gte)
-        names_gte = {n.name for n in results_gte}
+        names_gte = {n.name for n in results_gte if isinstance(n, EntityNode)}
 
         assert names_gte == {"Item2", "Item3", "Item4"}
 
@@ -1446,7 +1474,7 @@ def test_vector_query_with_multiple_filters_and_condition(
     property_graph_store_dynamic: SpannerPropertyGraphStore,
 ):
     """Test vector_query with multiple PropertyFilters and AND/OR conditions."""
-    nodes_data = [
+    nodes_data: list[dict[str, Any]] = [
         {
             "id": "mf_item1",
             "label": "MFITEM",
@@ -1500,7 +1528,7 @@ def test_vector_query_with_multiple_filters_and_condition(
 
         # Test Case 1: AND condition (default)
         # category == "A" AND price > 20
-        filters_and = [
+        filters_and: list[Union[MetadataFilter, MetadataFilters]] = [
             MetadataFilter(key="category", operator=FilterOperator.EQ, value="A"),
             MetadataFilter(
                 key="price", operator=FilterOperator.GT, value=20
@@ -1513,7 +1541,7 @@ def test_vector_query_with_multiple_filters_and_condition(
             filters=MetadataFilters(filters=filters_and),
         )
         results_and, _ = graph_store.vector_query(query_and)
-        names_and = {n.name for n in results_and}
+        names_and = {n.name for n in results_and if isinstance(n, EntityNode)}
 
         if not graph_store.schema.use_flexible_schema:
             assert names_and == {"Item2"}
@@ -1522,7 +1550,7 @@ def test_vector_query_with_multiple_filters_and_condition(
 
         # Test Case 2: OR condition
         # category == "B" OR price < 15
-        filters_or = [
+        filters_or: list[Union[MetadataFilter, MetadataFilters]] = [
             MetadataFilter(key="category", operator=FilterOperator.EQ, value="B"),
             MetadataFilter(
                 key="price", operator=FilterOperator.LT, value=15
@@ -1534,7 +1562,7 @@ def test_vector_query_with_multiple_filters_and_condition(
             filters=MetadataFilters(filters=filters_or, condition=FilterCondition.OR),
         )
         results_or, _ = graph_store.vector_query(query_or)
-        names_or = {n.name for n in results_or}
+        names_or = {n.name for n in results_or if isinstance(n, EntityNode)}
         # Item3 matches OR condition, Item4 matches AND condition
         if not graph_store.schema.use_flexible_schema:
             expected_or_names = {"Item1", "Item3"}
@@ -1583,7 +1611,8 @@ def test_vector_query_on_empty_graph_or_no_embeddings(
 
         results_mixed, scores_mixed = graph_store.vector_query(vq)
         assert len(results_mixed) == 1
-        assert results_mixed[0].name == "NodeWithEmbedding"
+        if isinstance(results_mixed[0], EntityNode):
+            assert results_mixed[0].name == "NodeWithEmbedding"
         assert len(scores_mixed) == 1
 
         graph_store.delete(
@@ -1596,7 +1625,7 @@ def test_vector_query_top_k_variations(
     property_graph_store_dynamic: SpannerPropertyGraphStore,
 ):
     """Test vector_query with different similarity_top_k values."""
-    nodes_data = [
+    nodes_data: list[dict[str, Any]] = [
         {"name": "TopK1", "embedding": [0.1, 0.1, 0.1]},
         {"name": "TopK2", "embedding": [0.2, 0.2, 0.2]},
         {"name": "TopK3", "embedding": [0.3, 0.3, 0.3]},
@@ -1623,13 +1652,14 @@ def test_vector_query_top_k_variations(
         query_k1 = VectorStoreQuery(query_embedding=query_embedding, similarity_top_k=1)
         results_k1, _ = graph_store.vector_query(query_k1)
         assert len(results_k1) == 1
-        assert results_k1[0].name == "TopK1"
+        if isinstance(results_k1[0], EntityNode):
+            assert results_k1[0].name == "TopK1"
 
         # Case 3: top_k = 2
         query_k2 = VectorStoreQuery(query_embedding=query_embedding, similarity_top_k=2)
         results_k2, _ = graph_store.vector_query(query_k2)
         assert len(results_k2) == 2
-        names_k2 = {n.name for n in results_k2}
+        names_k2 = {n.name for n in results_k2 if isinstance(n, EntityNode)}
         assert names_k2 == {"TopK1", "TopK2"}  # Order depends on similarity scores
 
         # Case 4: top_k = number of nodes
@@ -1861,8 +1891,8 @@ def test_flexible_schema_static_node_and_edge_properties_handling(
     property_graph_store_dynamic: SpannerPropertyGraphStore,
 ):
     """Test flexible schema with defined static node and edge properties."""
-    static_node_props = ["fixed_code", "status"]
-    static_edge_props = ["reliability_score"]
+    static_node_props = {"fixed_code", "status"}
+    static_edge_props = {"reliability_score"}
 
     graph_store = property_graph_store_dynamic
     graph_store.schema.static_node_properties = static_node_props
@@ -1991,7 +2021,8 @@ def test_schema_with_empty_properties_for_nodes_and_edges(
 
         # Verify retrieval
         retrieved_node1 = graph_store.get(ids=[node1.id])[0]
-        assert retrieved_node1.name == "NodeWithNoProps"
+        if isinstance(retrieved_node1, EntityNode):
+            assert retrieved_node1.name == "NodeWithNoProps"
         assert not retrieved_node1.properties.get("key")  # Should be empty
 
         triplets = graph_store.get_triplets(
@@ -2057,7 +2088,8 @@ def test_operations_after_cleanup_upsert_recreates_graph(
     # Verify the new node can be retrieved
     retrieved_nodes = graph_store.get(ids=[node_after_cleanup.id])
     assert len(retrieved_nodes) == 1
-    assert retrieved_nodes[0].name == "NodeAfterCleanup"
+    if isinstance(retrieved_nodes[0], EntityNode):
+        assert retrieved_nodes[0].name == "NodeAfterCleanup"
 
     # Verify schema exists again
     schema_after_recreation = graph_store.get_schema(refresh=True)

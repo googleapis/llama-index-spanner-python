@@ -28,5 +28,5 @@ annotations:
   - type: comment
     text: "/gcbrun"
   # Trigger Kokoro example
-  # - type: label
-  #   text: "kokoro:force-run"
+  - type: label
+    text: "kokoro:force-run"

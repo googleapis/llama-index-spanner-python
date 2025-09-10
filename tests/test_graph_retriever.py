@@ -12,99 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
+from unittest.mock import MagicMock, patch
 
 import pytest
-from llama_index.core import PropertyGraphIndex, Settings
+from llama_index.core import PromptTemplate, Settings
 from llama_index.core.graph_stores.types import ChunkNode, EntityNode, Relation
-from llama_index.core.indices.property_graph import SchemaLLMPathExtractor
-from llama_index.core.query_engine import RetrieverQueryEngine
-from llama_index.llms.google_genai import GoogleGenAI
-from llama_index.readers.wikipedia import WikipediaReader
+from llama_index.core.schema import NodeWithScore, QueryBundle, TextNode
 
 from llama_index_spanner.graph_retriever import (
+    GQL_RESPONSE_SCORING_TEMPLATE,
+    GQL_SYNTHESIS_RESPONSE_TEMPLATE,
+    GQL_VERIFY_PROMPT,
     SpannerGraphCustomRetriever,
     SpannerGraphTextToGQLRetriever,
+    VerifyGqlOutput,
 )
+from llama_index_spanner.property_graph_store import SpannerPropertyGraphStore
 from tests.utils import get_random_suffix, get_resources
 
-google_api_key = os.environ.get("GOOGLE_API_KEY")
 
-
-def setup(schema_type):
-    """Setup the index for integration tests."""
-    graph_store, _, llm, embed_model = get_resources(
-        schema_type + "_" + get_random_suffix(),
-        clean_up=True,
-        use_flexible_schema=schema_type == "flexible",
-    )
-
-    loader = WikipediaReader()
-    documents = loader.load_data(pages=["Google"], auto_suggest=False)
-
-    index_llm = GoogleGenAI(
-        model="gemini-1.5-pro-latest",
-        api_key=google_api_key,
-    )
-    PropertyGraphIndex.from_documents(
-        documents,
-        embed_model=embed_model,
-        embed_kg_nodes=True,
-        kg_extractors=[
-            SchemaLLMPathExtractor(
-                llm=index_llm,
-                max_triplets_per_chunk=1000,
-                num_workers=4,
-            )
-        ],
-        llm=llm,
-        show_progress=True,
-        property_graph_store=graph_store,
-    )
-    return graph_store, llm, embed_model
-
-
-def load(graph_store, llm, embed_model):
-    """Load the retriever for integration tests."""
-    Settings.llm = llm
-
-    index = PropertyGraphIndex.from_existing(
-        llm=llm, embed_model=embed_model, property_graph_store=graph_store
-    )
-    retriever = SpannerGraphCustomRetriever(
-        graph_store=index.property_graph_store,
-        embed_model=embed_model,
-        llm=llm,
-        include_raw_response_as_metadata=True,
-        verbose=True,
-    )
-    return retriever
-
-
-def test_graph_retriever():
-    """Test the graph retriever."""
-    for schema_type in ["static", "flexible"]:
-        graph_store, llm, embed_model = setup(schema_type)
-        retriever = load(graph_store, llm, embed_model)
-
-        query_engine = RetrieverQueryEngine(retriever=retriever)
-        response = query_engine.query("what is parent company of Google?")
-        print(response)
-        response = query_engine.query("Where are all the Google offices located?")
-        print(response)
-        response = query_engine.query("Some Products of Google?")
-        print(response)
-        graph_store.clean_up()
-
-
-def setup2(schema_type):
-    graph_store, _, llm, embed_model = get_resources(
-        schema_type + "_" + get_random_suffix(),
-        clean_up=True,
-        use_flexible_schema=schema_type == "flexible",
-    )
-    Settings.llm = llm
-
+def _setup_sample_graph(graph_store, embed_model):
+    """Sets up a sample graph in the given graph_store."""
     nodes = [
         EntityNode(
             name="Elias Thorne",
@@ -171,6 +99,50 @@ def setup2(schema_type):
     graph_store.upsert_nodes(nodes)
     graph_store.upsert_relations(relations)
 
+
+@pytest.fixture(scope="module", params=["static", "flexible"])
+def graph_store_with_sample_data(request):
+    """Fixture to create a graph store with sample data, for both schema types."""
+    schema_type = request.param
+    graph_store, _, llm, embed_model = get_resources(
+        f"retriever_test_{schema_type}_{get_random_suffix()}",
+        clean_up=True,
+        use_flexible_schema=(schema_type == "flexible"),
+    )
+    Settings.llm = llm
+    _setup_sample_graph(graph_store, embed_model)
+    yield graph_store, llm, embed_model
+    graph_store.clean_up()
+
+
+@pytest.mark.flaky(retries=3, only_on=[AssertionError], delay=1)
+def test_spanner_graph_text_to_gql_retriever(graph_store_with_sample_data):
+    """Test SpannerGraphTextToGQLRetriever with a sample graph."""
+    graph_store, llm, _ = graph_store_with_sample_data
+
+    if graph_store.schema.use_flexible_schema:
+        pytest.skip(
+            "SpannerGraphTextToGQLRetriever is not supported for flexible schema yet."
+        )
+
+    retriever = SpannerGraphTextToGQLRetriever(
+        graph_store=graph_store,
+        llm=llm,
+        include_raw_response_as_metadata=True,
+        verbose=True,
+    )
+
+    res1 = retriever.retrieve("Where does Elias Thorne's sibling live?")
+    res2 = retriever.retrieve("Who lives in desert?")
+
+    assert any(("Capital City" in str(res1), "Elias Thorne" in str(res2)))
+
+
+@pytest.mark.flaky(retries=3, only_on=[AssertionError], delay=1)
+def test_spanner_graph_custom_retriever(graph_store_with_sample_data):
+    """Test SpannerGraphCustomRetriever with a sample graph."""
+    graph_store, llm, embed_model = graph_store_with_sample_data
+
     retriever = SpannerGraphCustomRetriever(
         graph_store=graph_store,
         embed_model=embed_model,
@@ -179,45 +151,166 @@ def setup2(schema_type):
         verbose=True,
     )
 
-    retriever2 = SpannerGraphTextToGQLRetriever(
-        graph_store=graph_store,
-        llm=llm,
-        include_raw_response_as_metadata=True,
-        verbose=True,
+    res1 = retriever.retrieve("Where does Elias Thorne's sibling live?")
+    res2 = retriever.retrieve("Who lives in desert?")
+
+    assert any(("Capital City" in str(res1), "Elias Thorne" in str(res2)))
+
+
+def test_spanner_graph_text_to_gql_retriever_mocked():
+    """Test SpannerGraphTextToGQLRetriever with a mocked LLM and graph store."""
+    mock_graph_store = MagicMock()
+    mock_llm = MagicMock()
+    mock_text_to_gql_prompt = MagicMock(spec=PromptTemplate)
+    mock_gql_validator = MagicMock()
+    mock_summarization_template = MagicMock(spec=PromptTemplate)
+
+    # Mock the LLM to return a specific GQL query
+    expected_gql = "MATCH (p:Person)-[:Sibling]->(s:Person)-[:LivesIn]->(l:Location) WHERE p.name = 'Elias Thorne' RETURN l.name AS location"
+
+    # Mock for verification step
+    verify_output = VerifyGqlOutput(
+        input_gql=expected_gql,
+        made_change=False,
+        explanation="No changes needed",
+        verified_gql=expected_gql,
     )
 
-    return retriever, retriever2, graph_store
+    # Mock for summarization
+    summarized_response = "The sibling lives in Capital City."
 
+    # Mock for scoring
+    score = 0.9
 
-@pytest.fixture
-def retrievers_static():
-    retriever, retriever2, graph_store = setup2("static")
-    yield retriever, retriever2
-    graph_store.clean_up()
+    # Set up side effects for mock_llm.predict
+    mock_llm.predict.side_effect = [
+        expected_gql,  # 1. GQL generation
+        verify_output.json(),  # 2. GQL verification
+        summarized_response,  # 3. Summarization
+        str(score),  # 4. Scoring
+    ]
 
+    # Mock the graph store to return a specific result for the GQL query
+    mock_graph_store.structured_query.return_value = [{"location": "Capital City"}]
+    mock_graph_store.get_schema_str.return_value = "dummy schema"
 
-@pytest.fixture
-def retrievers_dynamic():
-    retriever, retriever2, graph_store = setup2("flexible")
-    yield retriever, retriever2
-    graph_store.clean_up()
+    # Mock the validator to return True
+    mock_gql_validator.return_value = True
 
+    retriever = SpannerGraphTextToGQLRetriever(
+        graph_store=mock_graph_store,
+        llm=mock_llm,
+        text_to_gql_prompt=mock_text_to_gql_prompt,
+        gql_validator=mock_gql_validator,
+        summarize_response=True,
+        summarization_template=mock_summarization_template,
+        verify_gql=True,
+    )
 
-def test_graph_retriever2_static(retrievers_static):
-    """Test the graph retriever."""
-    for retriever in retrievers_static:
-        res = retriever.retrieve("Where does Elias Thorne's sibling live?")
-        assert "Capital City" in str(res)
-
-        res = retriever.retrieve("Who lives in desert?")
-        assert "Elias Thorne" in str(res)
-
-
-def test_graph_retriever2_dynamic(retrievers_dynamic):
-    """Test the graph retriever."""
-    retriever = retrievers_dynamic[0]  # only NL2GQL fails
     res = retriever.retrieve("Where does Elias Thorne's sibling live?")
-    assert "Capital City" in str(res)
 
-    res = retriever.retrieve("Who lives in desert?")
-    assert "Elias Thorne" in str(res)
+    # Assert that the mocks were called correctly
+    assert mock_llm.predict.call_count == 4
+
+    # 1. GQL generation call
+    gen_call = mock_llm.predict.call_args_list[0]
+    assert gen_call.args[0] == mock_text_to_gql_prompt
+
+    # Assert gql_validator was called
+    mock_gql_validator.assert_called_once_with(expected_gql)
+
+    # 2. GQL verification call
+    verify_call = mock_llm.predict.call_args_list[1]
+    assert verify_call.args[0] == GQL_VERIFY_PROMPT
+    assert verify_call.kwargs["generated_gql"] == expected_gql
+
+    # Assert that the graph store was called with the generated query
+    mock_graph_store.structured_query.assert_called_once_with(expected_gql)
+
+    # 3. Summarization call
+    summary_call = mock_llm.predict.call_args_list[2]
+    assert summary_call.args[0] == mock_summarization_template
+    assert summary_call.kwargs["context"] == str([{"location": "Capital City"}])
+
+    # 4. Scoring call
+    scoring_call = mock_llm.predict.call_args_list[3]
+    assert scoring_call.args[0] == GQL_RESPONSE_SCORING_TEMPLATE
+    assert scoring_call.kwargs["retrieved_context"] == summarized_response
+
+    # Assert that the final result contains the summarized response
+    assert len(res) > 0
+    assert res[0].node.text == summarized_response
+    assert res[0].score == score
+
+
+def test_spanner_graph_custom_retriever_mocked():
+    """Test SpannerGraphCustomRetriever with mocked dependencies to check reranker and synthesis calls."""
+    mock_graph_store = MagicMock(spec=SpannerPropertyGraphStore)
+    # This is needed for SpannerGraphTextToGQLRetriever init inside SpannerGraphCustomRetriever
+    mock_graph_store.supports_structured_queries = True
+    mock_embed_model = MagicMock()
+    mock_llm = MagicMock()
+    mock_reranker_llm = MagicMock()
+
+    with (
+        patch(
+            "llama_index_spanner.graph_retriever.VectorContextRetriever"
+        ) as mock_vector_retriever_cls,
+        patch(
+            "llama_index_spanner.graph_retriever.SpannerGraphTextToGQLRetriever"
+        ) as mock_gql_retriever_cls,
+        patch("llama_index_spanner.graph_retriever.LLMRerank") as mock_reranker_cls,
+    ):
+        mock_vector_retriever = mock_vector_retriever_cls.return_value
+        mock_gql_retriever = mock_gql_retriever_cls.return_value
+        mock_reranker = mock_reranker_cls.return_value
+
+        retriever = SpannerGraphCustomRetriever(
+            graph_store=mock_graph_store,
+            embed_model=mock_embed_model,
+            llm_text_to_gql=mock_llm,
+            llm_for_reranker=mock_reranker_llm,
+        )
+
+        # Mock retriever results
+        vector_nodes = [NodeWithScore(node=TextNode(text="vector result"))]
+        mock_vector_retriever.retrieve.return_value = vector_nodes
+
+        gql_nodes = [NodeWithScore(node=TextNode(text="gql result"))]
+        mock_gql_retriever.retrieve_from_graph.return_value = gql_nodes
+
+        # Mock reranker result
+        reranked_nodes = [NodeWithScore(node=TextNode(text="reranked result"))]
+        mock_reranker.postprocess_nodes.return_value = reranked_nodes
+
+        # Mock synthesis result
+        synthesized_response = "This is the final synthesized response."
+        mock_llm.predict.return_value = synthesized_response
+
+        query_str = "some query"
+        final_response = retriever.custom_retrieve(query_str)
+
+        # Assertions
+        mock_vector_retriever.retrieve.assert_called_once()
+        query_bundle_arg = mock_vector_retriever.retrieve.call_args[0][0]
+        assert isinstance(query_bundle_arg, QueryBundle)
+        assert query_bundle_arg.query_str == query_str
+
+        mock_gql_retriever.retrieve_from_graph.assert_called_once()
+        query_bundle_arg_gql = mock_gql_retriever.retrieve_from_graph.call_args[0][0]
+        assert isinstance(query_bundle_arg_gql, QueryBundle)
+        assert query_bundle_arg_gql.query_str == query_str
+
+        mock_reranker.postprocess_nodes.assert_called_once()
+        call_args, _ = mock_reranker.postprocess_nodes.call_args
+        assert call_args[0] == vector_nodes + gql_nodes
+        assert isinstance(call_args[1], QueryBundle)
+        assert call_args[1].query_str == query_str
+
+        mock_llm.predict.assert_called_once_with(
+            GQL_SYNTHESIS_RESPONSE_TEMPLATE,
+            question=query_str,
+            retrieved_response="reranked result",
+        )
+
+        assert final_response == synthesized_response

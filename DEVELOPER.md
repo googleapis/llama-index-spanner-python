@@ -18,9 +18,23 @@ Learn more by reading [How should I write my commits?](https://github.com/google
 
 ### Run tests locally
 
-1. Set environment variables for `SPANNER_INSTANCE_ID`, `SPANNER_DATABASE_ID`, `SPANNER_GRAPH_NAME`, `GEMINI_API_KEY` or `GOOGLE_API_KEY`
+1. Set environment variables for `PROJECT_ID`, `SPANNER_INSTANCE_ID`, `SPANNER_DATABASE_ID`, `SPANNER_GRAPH_NAME` and `GOOGLE_API_KEY`
 
-2. Run pytest to automatically run all tests:
+2. Create a virtual environment and install dependencies:
+    ```bash
+    # Create the virtual environment
+    python3 -m venv venv
+
+    # Activate the environment (on macOS/Linux)
+    source venv/bin/activate
+
+    # On Windows, use: venv\Scripts\activate
+
+    # Install all required packages
+    pip install .[dependencies,test,lint]
+    ```
+
+3. Run pytest to automatically run all tests:
 
     ```bash
     pytest
@@ -30,7 +44,7 @@ Learn more by reading [How should I write my commits?](https://github.com/google
 
 ### CI Platform Setup
 
-Cloud Build is used to run tests against Google Cloud resources in test project: langchain-spanner-testing.
+Cloud Build is used to run tests against Google Cloud resources in test project: llamaindex-spanner-testing.
 Each test has a corresponding Cloud Build trigger, see [all triggers][triggers].
 These tests are registered as required tests in `.github/sync-repo-settings.yaml`.
 
@@ -43,7 +57,7 @@ name: integration-test-pr-py39
 description: Run integration tests on PR for Python 3.9
 filename: integration.cloudbuild.yaml
 github:
-  name: langchain-google-spanner-python
+  name: llama-index-spanner-python
   owner: googleapis
   pullRequest:
     branch: .*
@@ -54,9 +68,9 @@ ignoredFiles:
   - .github/**
   - "*.md"
 substitutions:
-  _INSTANCE_ID: <ADD_VALUE>
-  _PG_DATABASE: <ADD_VALUE>
-  _GOOGLE_DATABASE: <ADD_VALUE>
+  _SPANNER_INSTANCE_ID: <ADD_VALUE>
+  _SPANNER_DATABASE_ID: <ADD_VALUE>
+  _SPANNER_GRAPH_NAME: <ADD_VALUE>
   _VERSION: "3.9"
 ```
 
@@ -72,7 +86,7 @@ Use `gcloud builds triggers import --source=trigger.yaml` to create triggers via
 * Run integration test:
 
     ```bash
-    gcloud builds submit --config integration.cloudbuild.yaml --region us-central1 --substitutions=_INSTANCE_ID=$INSTANCE_ID
+    gcloud builds submit --config integration.cloudbuild.yaml --region us-central1 --substitutions=_SPANNER_INSTANCE_ID=$_SPANNER_INSTANCE_ID
     ```
 
 #### Trigger
@@ -92,4 +106,4 @@ Here is a breakdown of the report:
 - `Missing`: lines that are not covered by tests.
 
 
-[triggers]: https://console.cloud.google.com/cloud-build/triggers?e=13802955&project=langchain-spanner-testing
+[triggers]: https://console.cloud.google.com/cloud-build/triggers?e=13802955&project=llamaindex-spanner-testing
