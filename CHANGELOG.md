@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/googleapis/llama-index-spanner-python/compare/v0.1.3...v0.1.4) (2025-09-10)
+
+
+### Bug Fixes
+
+* Fix the readme not showing up ([#32](https://github.com/googleapis/llama-index-spanner-python/issues/32)) ([1499874](https://github.com/googleapis/llama-index-spanner-python/commit/1499874f7df215483d3d7697630620653c8a1307))
+
 ## [0.1.3](https://github.com/googleapis/llama-index-spanner-python/compare/v0.1.2...v0.1.3) (2025-08-26)
 
 
