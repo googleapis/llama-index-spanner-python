@@ -37,7 +37,7 @@ def index_and_models(request):
     documents = loader.load_data(pages=["Google"], auto_suggest=False)
 
     index_llm = GoogleGenAI(
-        model="gemini-1.5-pro-latest",
+        model="gemini-2.5-flash",
         api_key=google_api_key,
     )
     Settings.llm = query_llm
