@@ -52,7 +52,7 @@ def index_and_models(request):
         kg_extractors=[
             SchemaLLMPathExtractor(
                 llm=index_llm,
-                max_triplets_per_chunk=1000,
+                max_triplets_per_chunk=20,
                 num_workers=4,
             )
         ],
