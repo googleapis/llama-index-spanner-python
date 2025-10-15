@@ -50,9 +50,10 @@ test = [
     "pytest-xdist==3.6.1",
     "pytest-cov==5.0.0",
     "pytest-asyncio==0.24.0",
-    "llama-index-readers-wikipedia==0.3.0",
-    "llama-index-embeddings-google-genai==0.1.0",
-    "llama-index-llms-google-genai==0.1.4",
+    "llama-index-readers-wikipedia==0.4.1",
+    "llama-index-embeddings-google-genai==0.3.1",
+    "llama-index-llms-google-genai==0.6.2",
+    "google-genai==1.31.0",
     "wikipedia==1.4.0",
     "ipykernel==6.29.5"
 ]
