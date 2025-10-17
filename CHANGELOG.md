@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.5](https://github.com/googleapis/llama-index-spanner-python/compare/v0.1.4...v0.1.5) (2025-10-17)
+
+
+### Bug Fixes
+
+* Vector_query returning ChunkNodes + slow e2e rag test ([#40](https://github.com/googleapis/llama-index-spanner-python/issues/40)) ([bd0278d](https://github.com/googleapis/llama-index-spanner-python/commit/bd0278d0c30b2ca83e32684486033eebd502e8d6))
+
 ## [0.1.4](https://github.com/googleapis/llama-index-spanner-python/compare/v0.1.3...v0.1.4) (2025-09-10)
 
 
