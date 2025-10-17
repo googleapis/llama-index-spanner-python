@@ -20,7 +20,7 @@ from llama_index.llms.google_genai import GoogleGenAI
 from llama_index.readers.wikipedia import WikipediaReader
 
 from llama_index_spanner.graph_retriever import SpannerGraphCustomRetriever
-from tests.utils import get_random_suffix, get_resources, google_api_key
+from tests.utils import get_resources, google_api_key
 
 
 @pytest.fixture(scope="module", params=["static", "flexible"])
@@ -28,7 +28,7 @@ def index_and_models(request):
     """Setup the index for integration tests."""
     schema_type = request.param
     graph_store, _, query_llm, embed_model = get_resources(
-        f"e2e_rag_{schema_type}_{get_random_suffix()}",
+        f"e2e_rag_{schema_type}",
         clean_up=True,
         use_flexible_schema=(schema_type == "flexible"),
     )
@@ -52,7 +52,7 @@ def index_and_models(request):
         kg_extractors=[
             SchemaLLMPathExtractor(
                 llm=index_llm,
-                max_triplets_per_chunk=1000,
+                max_triplets_per_chunk=20,
                 num_workers=4,
             )
         ],
@@ -76,8 +76,6 @@ def test_e2e_rag(index_and_models):
         llm_text_to_gql=llm,
         include_raw_response_as_metadata=True,
         verbose=True,
-        similarity_top_k=10,
-        path_depth=3,
     )
 
     query_engine = RetrieverQueryEngine(retriever=retriever)
