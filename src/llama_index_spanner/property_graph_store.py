@@ -742,7 +742,11 @@ class SpannerPropertyGraphStore(PropertyGraphStore):
             if self.schema.use_flexible_schema
             else "labels(n)[0]"
         )
-        chunk_nodes_filter = f"(NOT PROPERTY_EXISTS(n, {ElementSchema.CHUNK_NODE_TEXT_COLUMN_NAME}) OR n.{ElementSchema.CHUNK_NODE_TEXT_COLUMN_NAME} IS NULL)" if (ElementSchema.CHUNK_NODE_TEXT_COLUMN_NAME in self.schema.properties) else "1 = 1"
+        chunk_nodes_filter = (
+            f"(NOT PROPERTY_EXISTS(n, {ElementSchema.CHUNK_NODE_TEXT_COLUMN_NAME}) OR n.{ElementSchema.CHUNK_NODE_TEXT_COLUMN_NAME} IS NULL)"
+            if (ElementSchema.CHUNK_NODE_TEXT_COLUMN_NAME in self.schema.properties)
+            else "1 = 1"
+        )
 
         data = self.structured_query(
             f"""

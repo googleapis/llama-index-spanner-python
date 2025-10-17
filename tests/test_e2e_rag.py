@@ -75,7 +75,7 @@ def test_e2e_rag(index_and_models):
         embed_model=embed_model,
         llm_text_to_gql=llm,
         include_raw_response_as_metadata=True,
-        verbose=True
+        verbose=True,
     )
 
     query_engine = RetrieverQueryEngine(retriever=retriever)
