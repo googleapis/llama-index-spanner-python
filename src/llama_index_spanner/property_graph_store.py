@@ -742,6 +742,7 @@ class SpannerPropertyGraphStore(PropertyGraphStore):
             if self.schema.use_flexible_schema
             else "labels(n)[0]"
         )
+        chunk_nodes_filter = f"(NOT PROPERTY_EXISTS(n, {ElementSchema.CHUNK_NODE_TEXT_COLUMN_NAME}) OR n.{ElementSchema.CHUNK_NODE_TEXT_COLUMN_NAME} IS NULL)" if (ElementSchema.CHUNK_NODE_TEXT_COLUMN_NAME in self.schema.properties) else "1 = 1"
 
         data = self.structured_query(
             f"""
@@ -749,6 +750,7 @@ class SpannerPropertyGraphStore(PropertyGraphStore):
         WHERE 
             n.{embedding_field} IS NOT NULL 
             AND ARRAY_LENGTH(n.{embedding_field}) = @dimension 
+            AND {chunk_nodes_filter}
             AND ({query_condition})
         WITH n, 
             1-COSINE_DISTANCE(n.{embedding_field}, ARRAY[{",".join(map(str, query.query_embedding))}]) AS score
