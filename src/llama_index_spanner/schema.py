@@ -101,10 +101,12 @@ class GraphDocumentUtility:
 
     @staticmethod
     def is_valid_identifier(s: str) -> bool:
-        return re.match(r"^[a-z][a-z0-9_]{0,127}$", s, re.IGNORECASE) is not None
+        return re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{0,127}", s) is not None
 
     @staticmethod
     def to_identifier(s: str) -> str:
+        if not GraphDocumentUtility.is_valid_identifier(s):
+            raise ValueError(f"Invalid Spanner identifier: {s!r}")
         return "`" + s + "`"
 
     @staticmethod
