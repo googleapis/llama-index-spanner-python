@@ -13,14 +13,29 @@
 # limitations under the License.
 
 import pytest
-from llama_index.core import PropertyGraphIndex, Settings
+from llama_index.core import Document, PropertyGraphIndex, Settings
 from llama_index.core.indices.property_graph import SchemaLLMPathExtractor
 from llama_index.core.query_engine import RetrieverQueryEngine
 from llama_index.llms.google_genai import GoogleGenAI
-from llama_index.readers.wikipedia import WikipediaReader
 
 from llama_index_spanner.graph_retriever import SpannerGraphCustomRetriever
-from tests.utils import get_resources, google_api_key
+from tests.utils import get_random_suffix, get_resources, google_api_key
+
+GOOGLE_OVERVIEW_TEXT = (
+    "Google LLC is an American multinational technology company focusing on "
+    "artificial intelligence, online advertising, search engine technology, "
+    "cloud computing, computer software, and consumer electronics. "
+    "Google is a subsidiary of its parent company, Alphabet Inc., which was "
+    "created in 2015 during a corporate restructuring. "
+    "Google was founded in 1998 by Larry Page and Sergey Brin while they were "
+    "PhD students at Stanford University in California.\n\n"
+    "Google's global headquarters, known as the Googleplex, is located in "
+    "Mountain View, California. Google also operates major offices in "
+    "New York City, Seattle, London, Zurich, Dublin, and Tokyo. "
+    "Major products developed by Google include Google Search, the Android "
+    "mobile operating system, the Google Chrome web browser, YouTube, Gmail, "
+    "Google Maps, and Google Cloud."
+)
 
 
 @pytest.fixture(scope="module", params=["static", "flexible"])
@@ -28,16 +43,15 @@ def index_and_models(request):
     """Setup the index for integration tests."""
     schema_type = request.param
     graph_store, _, query_llm, embed_model = get_resources(
-        f"e2e_rag_{schema_type}",
+        f"e2e_rag_{schema_type}_{get_random_suffix()}",
         clean_up=True,
         use_flexible_schema=(schema_type == "flexible"),
     )
 
-    loader = WikipediaReader()
-    documents = loader.load_data(pages=["Google"], auto_suggest=False)
+    documents = [Document(text=GOOGLE_OVERVIEW_TEXT)]
 
     index_llm = GoogleGenAI(
-        model="gemini-2.5-flash",
+        model="gemini-3.5-flash-lite",
         api_key=google_api_key,
     )
     Settings.llm = query_llm
