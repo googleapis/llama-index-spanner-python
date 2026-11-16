@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.6](https://github.com/googleapis/llama-index-spanner-python/compare/v0.1.5...v0.1.6) (2026-11-16)
+
+
+### Bug Fixes
+
+* Correct package name in graph_retriever notebook ([#43](https://github.com/googleapis/llama-index-spanner-python/issues/43)) ([00c037e](https://github.com/googleapis/llama-index-spanner-python/commit/00c037e655d3ee754b918b41a1842826ee3d5159))
+* Validate Spanner identifiers in to_identifier() ([#45](https://github.com/googleapis/llama-index-spanner-python/issues/45)) ([15893b4](https://github.com/googleapis/llama-index-spanner-python/commit/15893b440665d33451da045c5b780a55ff8c20ac))
+
 ## [0.1.5](https://github.com/googleapis/llama-index-spanner-python/compare/v0.1.4...v0.1.5) (2025-10-17)
 
 
