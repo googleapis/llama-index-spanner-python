@@ -10,7 +10,8 @@ authors = [
 ]
 dependencies = [
     "google-cloud-spanner>=3.41.0, <4.0.0",
-    "llama-index-core>=0.12.48, <1.0.0",
+    "llama-index-core>=0.12.48, <0.14.15; python_version < '3.10'",
+    "llama-index-core>=0.12.48, <1.0.0; python_version >= '3.10'",
     "llama-index>=0.12.41, <1.0.0",
     "banks<2.4.4; python_version < '3.10'",
 ]
@@ -56,7 +57,8 @@ test = [
     "llama-index-llms-google-genai==0.6.2",
     "google-genai==1.31.0",
     "wikipedia==1.4.0",
-    "ipykernel==6.29.5"
+    "ipykernel==6.29.5",
+    "python-dotenv==1.2.1",
 ]
 
 [build-system]

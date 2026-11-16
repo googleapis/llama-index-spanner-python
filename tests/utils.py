@@ -64,11 +64,11 @@ def get_resources(
     )
     storage_context = StorageContext.from_defaults(property_graph_store=graph_store)
     llm = GoogleGenAI(
-        model="gemini-2.0-flash",
+        model="gemini-3.5-flash-lite",
         api_key=google_api_key,
     )
     embed_model = GoogleGenAIEmbedding(
-        model_name="text-embedding-004", embed_batch_size=100
+        model_name="gemini-embedding-001", embed_batch_size=100
     )
     return graph_store, storage_context, llm, embed_model
 
