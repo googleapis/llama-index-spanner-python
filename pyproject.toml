@@ -58,7 +58,7 @@ test = [
     "google-genai==1.31.0",
     "wikipedia==1.4.0",
     "ipykernel==6.29.5",
-    "python-dotenv==1.2.1",
+    "python-dotenv==1.2.2",
 ]
 
 [build-system]
